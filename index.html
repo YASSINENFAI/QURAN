@@ -107,6 +107,7 @@ footer{max-width:1100px;margin:0 auto;padding:10px 20px 40px;color:var(--mute);f
 </div></div>
 <div><label for="ov">عتمة الخلفية</label><input id="ov" type="range" min="0" max="85" value="45"></div>
 </div>
+<div><label><input id="wordSync" type="checkbox" checked> مزامنة الكلمات</label><small id="syncNote" class="wake">المزامنة تقريبية لهذا القارئ</small></div>
 <div id="dur" class="dur" aria-live="polite"></div>
 <div id="warn" class="warn" role="alert" hidden></div>
 <button class="go" id="go" type="button" disabled>إنشاء الفيديو</button>
@@ -149,6 +150,7 @@ var durEl=$('dur'),warnEl=$('warn'),progEl=$('prog'),pfill=$('pfill'),pctEl=$('p
 var st={text:'',img:null,color:'#FFFFFF',ov:.45,ratio:'p',recording:false,progress:0,cur:1,phase:'idle'};
 var range={s:1,r:'yasser',from:1,to:1,texts:[],durations:[],total:0,ready:false};
 var textCache={},metaCache={},imgUrl=null,resUrl=null,ac=null;
+var wordSync=true, currentWord=-1;
 var prepToken=0,prepCtrl=null,confirmed=false,lastLayout=null,timeline=[];
 var textGate=0;
 var gen={rec:null,recDone:false,dest:null,stream:null,chunks:[],bytes:0,timer:0,startCtx:0,planned:0,lastPct:-1,lastRem:-1,sources:[],mime:'',wake:null,hidden:false,allDone:false,endAt:0,cancelled:false,failed:''};
@@ -298,25 +300,26 @@ function fetchBuffer(r,s,a){
 }
 
 /* ---------- رسم الآية ---------- */
-function wrap(text,maxW){
-  var words=text.split(' '),lines=[],cur='';
-  words.forEach(function(w){
-    var t=cur?cur+' '+w:w;
-    if(ctx.measureText(t).width>maxW&&cur){lines.push(cur);cur=w}else cur=t;
-  });
-  if(cur)lines.push(cur);
-  return lines;
-}
+function stripMarks(s){return String(s||'').replace(/[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED]/g,'')}
+function wrap(text,maxW){var words=String(text||'').trim().split(/\s+/).filter(Boolean),lines=[],cur=[];words.forEach(function(w){var t=cur.concat([w]).join(' ');if(ctx.measureText(t).width>maxW&&cur.length){lines.push(cur);cur=[w]}else cur.push(w)});if(cur.length)lines.push(cur);return lines}
 function layout(text,w,h){
-  if(lastLayout&&lastLayout.text===text&&lastLayout.w===w&&lastLayout.h===h)return lastLayout;
-  var m=Math.min(w,h),maxW=w*.84,maxH=h*.6,size=m*.09,lines;
-  for(;size>m*.012;size-=2){
-    ctx.font=size+'px "Amiri Quran",serif';
-    lines=wrap(text,maxW);
-    if(lines.length*size*1.95<=maxH)break;
-  }
-  lastLayout={text:text,w:w,h:h,size:size,lines:lines};
-  return lastLayout;
+ if(lastLayout&&lastLayout.text===text&&lastLayout.w===w&&lastLayout.h===h)return lastLayout;
+ var m=Math.min(w,h),maxW=w*.84,maxH=h*.6,size=m*.09,lines;
+ for(;size>m*.012;size-=2){ctx.font=size+'px "Amiri Quran",serif';lines=wrap(text,maxW);if(lines.length*size*1.95<=maxH)break;}
+ var positions=[],lh=size*1.95,y0=h*.46-(lines.length-1)*lh/2;ctx.font=size+'px "Amiri Quran",serif';
+ lines.forEach(function(line,li){var widths=line.map(function(word){return ctx.measureText(word).width}),total=widths.reduce(function(a,b){return a+b},0)+size*.35*Math.max(0,line.length-1),x=(w+total)/2,row=[];
+ line.forEach(function(word,wi){x-=widths[wi];row.push({word:word,x:x+widths[wi]/2,y:y0+li*lh,width:widths[wi]});x-=size*.35});positions.push(row);
+ });lastLayout={text:text,w:w,h:h,size:size,lines:lines,positions:positions};return lastLayout;
+}
+function getWordTimings(reciter,surah,ayah,words,audioBuffer){
+ var n=words.length;if(!n||!audioBuffer||!audioBuffer.length)return [];var sr=audioBuffer.sampleRate,frame=Math.max(1,Math.floor(sr*.02)),rms=[],data=[];
+ for(var ch=0;ch<audioBuffer.numberOfChannels;ch++)data.push(audioBuffer.getChannelData(ch));
+ for(var p=0;p<audioBuffer.length;p+=frame){var sum=0,count=0;for(var ch=0;ch<data.length;ch++){var d=data[ch],end=Math.min(p+frame,d.length);for(var j=p;j<end;j+=4){sum+=d[j]*d[j];count++}}rms.push({t:p/sr,v:count?Math.sqrt(sum/count):0})}
+ var peak=0;rms.forEach(function(x){peak=Math.max(peak,x.v)});var threshold=Math.max(.006,peak*.12),first=0,last=rms.length-1;while(first<rms.length&&rms[first].v<threshold)first++;while(last>first&&rms[last].v<threshold)last--;
+ var start=rms[first]?rms[first].t:0,end=rms[last]?Math.min(audioBuffer.duration,rms[last].t+.02):audioBuffer.duration;if(end-start<.1){start=0;end=audioBuffer.duration}
+ var gaps=[];for(var k=first+2;k<last-2;k++)if(rms[k].v<threshold*.45&&rms[k-1].v<threshold*.45&&rms[k+1].v<threshold*.45){var gt=rms[k].t;if(!gaps.length||gt-gaps[gaps.length-1]>.18)gaps.push(gt)}
+ var weights=words.map(function(w){var raw=stripMarks(w).replace(/[۞۩،؛؟.!:]/g,''),len=Math.max(1,Array.from(raw).length),long=/(َا|ُو|ِي|آ|آ|ٰ)/u.test(w)?1.45:1,pause=/[۞۩،؛؟.!:]/u.test(w)?1.35:1;return len*long*pause}),total=weights.reduce(function(a,b){return a+b},0)||n,cursor=start,out=[];
+ words.forEach(function(w,i){var a=cursor,b=i===n-1?end:cursor+(end-start)*weights[i]/total;if(i<n-1&&gaps.length){var near=null,dist=.16;gaps.forEach(function(g){var d=Math.abs(g-b);if(d<dist&&g>a+.04&&g<end-.04){near=g;dist=d}});if(near!==null)b=near}out.push({start:Math.max(0,a),end:Math.max(a+.02,b)});cursor=out[i].end});if(out.length)out[out.length-1].end=audioBuffer.duration;return out;
 }
 function draw(){
   var w=cv.width,h=cv.height,m=Math.min(w,h);
@@ -331,11 +334,9 @@ function draw(){
   ctx.direction='rtl';ctx.textAlign='center';ctx.textBaseline='middle';
   var text=st.text||(st.phase==='error'?'تعذر تحميل النص':'جارٍ تحميل النص…');
   var L=layout(text,w,h);
-  ctx.font=L.size+'px "Amiri Quran",serif';
-  var lh=L.size*1.95,y0=h*.46-(L.lines.length-1)*lh/2;
-  ctx.fillStyle=st.color;ctx.shadowColor='rgba(0,0,0,.35)';ctx.shadowBlur=m*.012;
-  L.lines.forEach(function(l,i){ctx.fillText(l,w/2,y0+i*lh)});
-  ctx.shadowBlur=0;
+  ctx.font=L.size+'px "Amiri Quran",serif';ctx.fillStyle=st.color;ctx.shadowColor='rgba(0,0,0,.35)';ctx.shadowBlur=m*.012;
+  var active=wordSync&&st.recording?currentWord:-1,flat=0;
+  L.positions.forEach(function(row){row.forEach(function(p){ctx.globalAlpha=wordSync&&st.recording&&active>=0&&flat>active?.38:1;ctx.fillStyle=(wordSync&&st.recording&&flat===active)?'#F2D58A':st.color;ctx.fillText(p.word,p.x,p.y);flat++})});ctx.globalAlpha=1;ctx.shadowBlur=0;
   var label;
   if(st.recording){
     label='سورة '+NAMES[range.s-1]+' • الآية '+ar(st.cur||range.from);
@@ -540,8 +541,8 @@ function currEntry(now){
 function frame(){
   if(!st.recording)return;
   var a=ctxAudio(),now=a.currentTime;
-  var e=currEntry(now);
-  if(e){st.cur=e.a;st.text=range.texts[e.a]||''}
+  var e=currEntry(now);currentWord=-1;
+  if(e){st.cur=e.a;st.text=range.texts[e.a]||'';if(wordSync&&e.words){var local=now-e.start;for(var wi=0;wi<e.words.length;wi++)if(local>=e.words[wi].start&&local<e.words[wi].end){currentWord=wi;break}}}
   var elapsed=Math.max(0,now-gen.startCtx);
   var total=gen.planned>0?gen.planned:1;
   var pct=Math.min(elapsed/total,.999);
@@ -582,7 +583,8 @@ function scheduleAll(){
         var k=gen.sources.indexOf(src);if(k>-1)gen.sources.splice(k,1);
       };
     }catch(e){fail('تعذر تشغيل صوت الآية. أعد المحاولة.');return}
-    timeline.push({a:idx,start:t,end:t+buf.duration});
+    var ayahWords=(range.texts[idx]||'').trim().split(/\s+/).filter(Boolean),timings=getWordTimings(r,s,idx,ayahWords,buf);
+    timeline.push({a:idx,start:t,end:t+buf.duration,words:timings});
     when=t+buf.duration;
     // لا نُنقص المدة المعلنة أثناء الجدولة حتى لا يقفز شريط التقدم إلى النهاية
     gen.planned=Math.max(gen.planned,(when-gen.startCtx)+TAIL);
@@ -697,6 +699,7 @@ $('full').addEventListener('click',function(){
   selF.value='1';selT.value=String(c);syncLimits();prepare();
 });
 selR.addEventListener('change',prepare);
+$('wordSync').addEventListener('change',function(e){wordSync=!!e.target.checked;$('syncNote').hidden=!wordSync;currentWord=-1;lastLayout=null;draw()});
 $('retry').addEventListener('click',prepare);
 $('ov').addEventListener('input',function(e){st.ov=e.target.value/100;lastLayout=null;draw()});
 function seg(id,attr,fn){
