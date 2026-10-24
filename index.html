@@ -802,7 +802,7 @@ $('bgPresets').addEventListener('click',function(e){
 });
 $('bg').addEventListener('change',function(e){
   var f=e.target.files[0];if(!f)return;
-  if(!/^image\\//.test(f.type)){say('الملف المختار ليس صورة. اختر ملف صورة.',true);return}
+  if(!/^image\//.test(f.type)){say('الملف المختار ليس صورة. اختر ملف صورة.',true);return}
   var u=URL.createObjectURL(f),im=new Image();
   im.onload=function(){
     if(imgUrl)URL.revokeObjectURL(imgUrl);imgUrl=u;st.img=im;
