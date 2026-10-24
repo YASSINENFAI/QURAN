@@ -38,6 +38,18 @@ select,input[type=file]{width:100%;font:inherit;padding:10px 12px;border:1px sol
 .seg button{flex:1;border:0;background:none;padding:9px 6px;font:inherit;color:var(--mute);cursor:pointer}
 .seg button+button{border-inline-start:1px solid var(--line)}
 .seg button[aria-pressed=true]{background:var(--green);color:#fff}
+.background-picker{display:grid;gap:8px}
+.bg-presets{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.bg-choice{min-width:0;padding:5px 4px 7px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);font:500 12px/1.4 "IBM Plex Sans Arabic",sans-serif;cursor:pointer}
+.bg-choice[aria-pressed=true]{border:2px solid var(--brass);padding:4px 3px 6px;box-shadow:0 0 0 1px rgba(169,124,47,.15)}
+.bg-swatch{display:block;height:54px;border-radius:6px;margin-bottom:5px;border:1px solid rgba(255,255,255,.25)}
+.bg-emerald{background:radial-gradient(circle at 50% 45%,#287968,#0A2925 80%)}
+.bg-night{background:radial-gradient(circle at 50% 25%,#415b8a,#111b3c 78%)}
+.bg-sand{background:linear-gradient(155deg,#f0d9a0,#b77b42 52%,#583a2b)}
+.bg-blue{background:linear-gradient(145deg,#6b9eae,#244e6a 55%,#132c43)}
+.bg-paper{background:linear-gradient(145deg,#fff7df,#d9c79e 65%,#a99162)}
+.upload-label{margin-top:5px}
+@media(max-width:420px){.bg-presets{grid-template-columns:repeat(3,minmax(0,1fr))}.bg-swatch{height:48px}}
 .sw{display:flex;gap:10px}
 .sw button{width:38px;height:38px;border-radius:50%;border:2px solid var(--line);cursor:pointer;padding:0}
 .sw button[aria-pressed=true]{outline:3px solid var(--brass);outline-offset:2px}
@@ -124,7 +136,19 @@ footer{max-width:1100px;margin:0 auto;padding:10px 20px 40px;color:var(--mute);f
 <div><label for="ayahTo">إلى الآية</label><select id="ayahTo"></select></div>
 </div>
 <button type="button" class="mini" id="full">السورة كاملة</button>
-<div><label for="bg">صورة الخلفية</label><input id="bg" type="file" accept="image/*"></div>
+<div class="background-picker">
+<label>اختر خلفية</label>
+<div class="bg-presets" id="bgPresets" role="group" aria-label="الخلفيات الجاهزة">
+<button type="button" class="bg-choice" data-bg="0" aria-pressed="true"><span class="bg-swatch bg-emerald"></span><span>أخضر إسلامي</span></button>
+<button type="button" class="bg-choice" data-bg="1" aria-pressed="false"><span class="bg-swatch bg-night"></span><span>سماء ليلية</span></button>
+<button type="button" class="bg-choice" data-bg="2" aria-pressed="false"><span class="bg-swatch bg-sand"></span><span>رمال ذهبية</span></button>
+<button type="button" class="bg-choice" data-bg="3" aria-pressed="false"><span class="bg-swatch bg-blue"></span><span>أزرق هادئ</span></button>
+<button type="button" class="bg-choice" data-bg="4" aria-pressed="false"><span class="bg-swatch bg-paper"></span><span>عاجي فاخر</span></button>
+</div>
+<label for="bg" class="upload-label">أو حمّل صورة من جهازك</label>
+<input id="bg" type="file" accept="image/*">
+<small class="wake">يمكنك التبديل بين الخلفيات الجاهزة أو اختيار صورتك الخاصة.</small>
+</div>
 <div><span class="lbl">أبعاد الفيديو</span>
 <div class="seg" id="ratio" role="group" aria-label="أبعاد الفيديو">
 <button type="button" data-r="p" aria-pressed="true">طولي 9:16</button>
@@ -180,7 +204,7 @@ var $=function(i){return document.getElementById(i)};
 var cv=$('cv'),ctx=cv.getContext('2d');
 var selS=$('surah'),selF=$('ayahFrom'),selT=$('ayahTo'),selR=$('reciter'),go=$('go'),msg=$('msg'),fs=$('fs');
 var durEl=$('dur'),warnEl=$('warn'),progEl=$('prog'),pfill=$('pfill'),pctEl=$('pct'),remainEl=$('remain'),pnowEl=$('pnow'),wakeEl=$('wake'),cancelBtn=$('cancel');
-var st={text:'',img:null,color:'#FFFFFF',ov:.45,ratio:'p',recording:false,progress:0,cur:1,phase:'idle'};
+var st={text:'',img:null,bgPreset:0,color:'#FFFFFF',ov:.45,ratio:'p',recording:false,progress:0,cur:1,phase:'idle'};
 var range={s:1,r:'yasser',from:1,to:1,texts:[],durations:[],total:0,ready:false};
 var textCache={},metaCache={},imgUrl=null,resUrl=null,ac=null;
 var wordSync=true, currentWord=-1;
@@ -360,8 +384,32 @@ function draw(){
     var s=Math.max(w/st.img.width,h/st.img.height),iw=st.img.width*s,ih=st.img.height*s;
     ctx.drawImage(st.img,(w-iw)/2,(h-ih)/2,iw,ih);
   }else{
-    var g=ctx.createLinearGradient(0,0,w,h);g.addColorStop(0,'#14564B');g.addColorStop(1,'#0A2420');
+    var palettes=[['#287968','#0A2925','#E3C16F'],['#415B8A','#111B3C','#D8C9FF'],['#F0D9A0','#583A2B','#FFF0C2'],['#6B9EAE','#132C43','#D5F0FF'],['#FFF7DF','#A99162','#71552D']];
+    var pal=palettes[st.bgPreset]||palettes[0];
+    var g=ctx.createLinearGradient(0,0,w,h);g.addColorStop(0,pal[0]);g.addColorStop(1,pal[1]);
     ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
+    ctx.save();
+    if(st.bgPreset===0){
+      ctx.strokeStyle='rgba(227,193,111,.22)';ctx.lineWidth=Math.max(1,m*.002);
+      for(var k=-h;k<w;k+=m*.12){ctx.beginPath();ctx.moveTo(k,0);ctx.lineTo(k+h,h);ctx.stroke();ctx.beginPath();ctx.moveTo(k,h);ctx.lineTo(k+h,0);ctx.stroke()}
+      ctx.strokeStyle='rgba(248,249,246,.12)';ctx.lineWidth=Math.max(1,m*.0015);
+      for(var q=1;q<5;q++){ctx.beginPath();ctx.arc(w/2,h/2,m*q*.11,0,Math.PI*2);ctx.stroke()}
+    }else if(st.bgPreset===1){
+      for(var si=0;si<90;si++){var sx=((si*137)%997)/997*w,sy=((si*251)%991)/991*h;ctx.fillStyle='rgba(255,255,255,'+(.15+(si%5)*.08)+')';ctx.beginPath();ctx.arc(sx,sy,Math.max(1,m*(.0008+(si%3)*.0007)),0,Math.PI*2);ctx.fill()}
+      ctx.fillStyle='rgba(8,13,35,.48)';ctx.beginPath();ctx.moveTo(0,h*.78);ctx.quadraticCurveTo(w*.25,h*.66,w*.48,h*.8);ctx.quadraticCurveTo(w*.76,h*.91,w,h*.72);ctx.lineTo(w,h);ctx.lineTo(0,h);ctx.fill();
+    }else if(st.bgPreset===2){
+      ctx.fillStyle='rgba(255,239,191,.3)';ctx.beginPath();ctx.arc(w*.75,h*.2,m*.09,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='rgba(92,54,34,.35)';ctx.beginPath();ctx.moveTo(0,h*.72);ctx.quadraticCurveTo(w*.3,h*.48,w*.58,h*.75);ctx.quadraticCurveTo(w*.8,h*.9,w,h*.62);ctx.lineTo(w,h);ctx.lineTo(0,h);ctx.fill();
+      ctx.strokeStyle='rgba(255,240,194,.24)';ctx.lineWidth=Math.max(1,m*.002);for(var di=0;di<5;di++){ctx.beginPath();ctx.moveTo(0,h*(.72+di*.045));ctx.quadraticCurveTo(w*.45,h*(.61+di*.05),w,h*(.75+di*.04));ctx.stroke()}
+    }else if(st.bgPreset===3){
+      ctx.strokeStyle='rgba(213,240,255,.18)';ctx.lineWidth=Math.max(1,m*.002);
+      for(var wi=1;wi<9;wi++){ctx.beginPath();ctx.arc(w*.5,h*.5,m*wi*.09,0,Math.PI*2);ctx.stroke()}
+      ctx.fillStyle='rgba(8,30,48,.25)';ctx.fillRect(0,h*.82,w,h*.18);
+    }else{
+      ctx.strokeStyle='rgba(113,85,45,.22)';ctx.lineWidth=Math.max(1,m*.002);
+      for(var py=m*.06;py<h;py+=m*.09)for(var px=m*.06;px<w;px+=m*.09){ctx.beginPath();ctx.moveTo(px,py-m*.018);ctx.lineTo(px+m*.018,py);ctx.lineTo(px,py+m*.018);ctx.lineTo(px-m*.018,py);ctx.closePath();ctx.stroke()}
+    }
+    ctx.restore();
   }
   ctx.fillStyle='rgba(4,16,14,'+st.ov+')';ctx.fillRect(0,0,w,h);
   ctx.direction='rtl';ctx.textAlign='center';ctx.textBaseline='middle';
@@ -745,11 +793,22 @@ function seg(id,attr,fn){
 }
 seg('ratio','data-r',function(v){st.ratio=v;cv.width=DIMS[v][0];cv.height=DIMS[v][1];lastLayout=null;draw()});
 seg('colors','data-c',function(v){st.color=v;draw()});
+$('bgPresets').addEventListener('click',function(e){
+  var b=e.target.closest('button[data-bg]');if(!b)return;
+  st.bgPreset=+b.getAttribute('data-bg');st.img=null;
+  [].forEach.call($('bgPresets').querySelectorAll('button'),function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});
+  $('bg').value='';if(imgUrl){URL.revokeObjectURL(imgUrl);imgUrl=null}
+  draw();
+});
 $('bg').addEventListener('change',function(e){
   var f=e.target.files[0];if(!f)return;
-  if(!/^image\//.test(f.type)){say('الملف المختار ليس صورة. اختر ملف صورة.',true);return}
+  if(!/^image\\//.test(f.type)){say('الملف المختار ليس صورة. اختر ملف صورة.',true);return}
   var u=URL.createObjectURL(f),im=new Image();
-  im.onload=function(){if(imgUrl)URL.revokeObjectURL(imgUrl);imgUrl=u;st.img=im;draw()};
+  im.onload=function(){
+    if(imgUrl)URL.revokeObjectURL(imgUrl);imgUrl=u;st.img=im;
+    [].forEach.call($('bgPresets').querySelectorAll('button'),function(x){x.setAttribute('aria-pressed','false')});
+    draw();
+  };
   im.onerror=function(){URL.revokeObjectURL(u);say('تعذر قراءة الصورة. جرّب صورة أخرى.',true)};
   im.src=u;
 });
