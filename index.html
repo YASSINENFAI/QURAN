@@ -680,7 +680,8 @@ function onStop(){
   d.href=resUrl;
   d.download='ayah-'+range.s+'-'+range.from+(range.to>range.from?'-'+range.to:'')+'.'+ext;
   $('result').style.display='block';
-  say('تم إنشاء الفيديو. يمكنك تحميله الآن.');
+  if(ext==='webm')say('تم إنشاء الفيديو بصيغة WebM. قد لا يعمل في بعض إصدارات واتساب أو إنستغرام؛ إذا احتجت MP4 بترميز H.264/AAC فحوّله بأداة موثوقة قبل المشاركة.');
+  else say('تم إنشاء الفيديو بصيغة MP4. تحقق من تشغيله على جهازك قبل مشاركته.');
   $('result').scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
