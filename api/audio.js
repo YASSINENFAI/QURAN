@@ -8,7 +8,6 @@ const RECITERS = {
   yasser: 'Yasser_Ad-Dussary_128kbps',
   maher: 'MaherAlMuaiqly128kbps',
   sudais: 'Abdurrahmaan_As-Sudais_192kbps',
-  luhaidan: 'Muhammad_Luhaidan_128kbps',
   alafasy: 'Alafasy_128kbps'
 };
 
