@@ -60,8 +60,8 @@ module.exports = async (req, res) => {
   const { r, s, a, meta } = req.query;
   const folder = typeof r === 'string' ? RECITERS[r] : null;
   // Accept only canonical positive integers; parseInt alone would accept values such as "2abc".
-  if (typeof s !== 'string' || !/^\\d{1,3}$/.test(s) ||
-      typeof a !== 'string' || !/^\\d{1,3}$/.test(a) ||
+  if (typeof s !== 'string' || !/^\d{1,3}$/.test(s) ||
+      typeof a !== 'string' || !/^\d{1,3}$/.test(a) ||
       !folder || (meta !== undefined && meta !== '1' && meta !== 'true')) {
     return res.status(400).json({ error: 'invalid parameters' });
   }
