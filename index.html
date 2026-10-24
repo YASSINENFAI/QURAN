@@ -188,7 +188,7 @@ var prepToken=0,prepCtrl=null,confirmed=false,lastLayout=null,timeline=[];
 var textGate=0;
 var gen={rec:null,recDone:false,dest:null,stream:null,chunks:[],bytes:0,timer:0,startCtx:0,planned:0,lastPct:-1,lastRem:-1,sources:[],mime:'',wake:null,hidden:false,allDone:false,endAt:0,cancelled:false,failed:''};
 
-var ar=function(n){return Number(n).toLocaleString('ar-EG')};
+var ar=function(n){return Number(n).toLocaleString('en-US')};
 
 NAMES.forEach(function(n,i){var o=document.createElement('option');o.value=i+1;o.textContent=ar(i+1)+'. '+n;selS.appendChild(o)});
 
