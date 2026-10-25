@@ -219,7 +219,7 @@ function initPresence(){
     var channel=client.channel('quran-online',{config:{presence:{key:key}}});
     function update(){
       var state=channel.presenceState(),count=Object.keys(state).length;
-      box.className='presence';label.textContent='متصلون الآن: '+count.toLocaleString('ar-EG');
+      box.className='presence';label.textContent='متصلون الآن: '+count.toLocaleString('en-US');
     }
     channel.on('presence',{event:'sync'},update).on('presence',{event:'join'},update).on('presence',{event:'leave'},update);
     channel.subscribe(function(status){
