@@ -10,6 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--bg:#ECEFEA;--panel:#F8F9F6;--ink:#14302B;--mute:#5B6D68;--line:#C9D2CB;--green:#14564B;--green2:#0E3F37;--brass:#A97C2F;--err:#9B2C2C}
 *{box-sizing:border-box}
@@ -70,6 +71,10 @@ input[type=range]{width:100%;accent-color:var(--green)}
 .warn.strong{background:#FDECEC;border-color:#E2A3A3;color:#7A1F1F}
 .warn .warn-go{margin-top:10px;width:auto;padding:10px 18px;font-size:15px;background:#9B2C2C}
 .warn .warn-go:hover{background:#7A1F1F}
+.presence{display:inline-flex;align-items:center;gap:8px;margin-top:12px;padding:7px 11px;border:1px solid #BFD4C8;border-radius:999px;background:#F5FAF6;color:var(--green);font-size:14px;font-weight:600}
+.presence-dot{width:9px;height:9px;border-radius:50%;background:#24A148;box-shadow:0 0 0 3px rgba(36,161,72,.14)}
+.presence.is-loading{color:var(--mute);font-weight:400}.presence.is-loading .presence-dot{background:#A7B5AE;box-shadow:none}
+.presence.is-error{color:var(--err);font-weight:400}.presence.is-error .presence-dot{background:#C98A8A;box-shadow:none}
 .prog{margin-top:18px;display:grid;gap:8px}
 .pbar{height:10px;background:#DCE3DC;border-radius:6px;overflow:hidden}
 .pbar i{display:block;height:100%;width:0;background:var(--green);transition:width .2s linear}
@@ -117,6 +122,7 @@ footer{max-width:1100px;margin:0 auto;padding:10px 20px 40px;color:var(--mute);f
 </div>
 </nav>
 <p>اختر نطاق الآيات — من آية إلى آية أو السورة كاملة — والقارئ وصورة الخلفية، وحمّل فيديو يتغيّر نصه مع كل آية في وقتها.</p>
+<div id="presence" class="presence is-loading" role="status" aria-live="polite"><span class="presence-dot" aria-hidden="true"></span><span id="presenceText">جارٍ حساب المتصلين…</span></div>
 </header>
 <main>
 <section class="panel" aria-label="إعدادات الفيديو">
@@ -204,6 +210,25 @@ var $=function(i){return document.getElementById(i)};
 var cv=$('cv'),ctx=cv.getContext('2d');
 var selS=$('surah'),selF=$('ayahFrom'),selT=$('ayahTo'),selR=$('reciter'),go=$('go'),msg=$('msg'),fs=$('fs');
 var durEl=$('dur'),warnEl=$('warn'),progEl=$('prog'),pfill=$('pfill'),pctEl=$('pct'),remainEl=$('remain'),pnowEl=$('pnow'),wakeEl=$('wake'),cancelBtn=$('cancel');
+function initPresence(){
+  var box=$('presence'),label=$('presenceText');
+  if(!box||!label||!window.supabase){box.className='presence is-error';label.textContent='تعذر تحميل عداد المتصلين';return}
+  try{
+    var client=window.supabase.createClient('https://zavuepkvvnfisykuloez.supabase.co','sb_publishable_xtT9fzK88A6qGVFwva1acQ_QdGrnWYv');
+    var key=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():Math.random().toString(36).slice(2)+Date.now();
+    var channel=client.channel('quran-online',{config:{presence:{key:key}}});
+    function update(){
+      var state=channel.presenceState(),count=Object.keys(state).length;
+      box.className='presence';label.textContent='متصلون الآن: '+count.toLocaleString('ar-EG');
+    }
+    channel.on('presence',{event:'sync'},update).on('presence',{event:'join'},update).on('presence',{event:'leave'},update);
+    channel.subscribe(function(status){
+      if(status==='SUBSCRIBED')channel.track({online_at:new Date().toISOString()}).then(update);
+      else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'){box.className='presence is-error';label.textContent='تعذر الاتصال بعداد المتصلين'}
+    });
+  }catch(e){box.className='presence is-error';label.textContent='تعذر تحميل عداد المتصلين'}
+}
+initPresence();
 var st={text:'',img:null,bgPreset:0,color:'#FFFFFF',ov:.45,ratio:'p',recording:false,progress:0,cur:1,phase:'idle'};
 var range={s:1,r:'yasser',from:1,to:1,texts:[],durations:[],total:0,ready:false};
 var textCache={},metaCache={},imgUrl=null,resUrl=null,ac=null;
