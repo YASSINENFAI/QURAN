@@ -215,6 +215,7 @@ function initPresence(){
   if(!box||!label||!window.supabase){box.className='presence is-error';label.textContent='تعذر تحميل عداد المتصلين';return}
   try{
     var client=window.supabase.createClient('https://zavuepkvvnfisykuloez.supabase.co','sb_publishable_xtT9fzK88A6qGVFwva1acQ_QdGrnWYv');
+    recordVisit(client);
     var key=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():Math.random().toString(36).slice(2)+Date.now();
     var channel=client.channel('quran-online',{config:{presence:{key:key}}});
     function update(){
@@ -227,6 +228,17 @@ function initPresence(){
       else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'){box.className='presence is-error';label.textContent='تعذر الاتصال بعداد المتصلين'}
     });
   }catch(e){box.className='presence is-error';label.textContent='تعذر تحميل عداد المتصلين'}
+}
+function recordVisit(client){
+  try{
+    var visitorId=localStorage.getItem('quran_visitor_id');
+    if(!visitorId){visitorId=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():Math.random().toString(36).slice(2)+Date.now();localStorage.setItem('quran_visitor_id',visitorId)}
+    var last=Number(localStorage.getItem('quran_last_visit_at')||0);
+    if(last&&Date.now()-last<86400000)return;
+    client.from('site_visits').insert({visitor_id:visitorId}).then(function(result){
+      if(!result.error)localStorage.setItem('quran_last_visit_at',String(Date.now()));
+    });
+  }catch(e){}
 }
 initPresence();
 var st={text:'',img:null,bgPreset:0,color:'#FFFFFF',ov:.45,ratio:'p',recording:false,progress:0,cur:1,phase:'idle'};
