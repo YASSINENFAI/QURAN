@@ -192,6 +192,7 @@ footer{max-width:1100px;margin:0 auto;padding:10px 20px 40px;color:var(--mute);f
 <div id="result" class="panel">
 <video id="vid" controls playsinline></video>
 <a class="go" id="dl" href="#">تحميل الفيديو</a>
+<button class="go" id="shareVideo" type="button" hidden>حفظ أو مشاركة الفيديو</button>
 </div>
 </section>
 </main>
@@ -244,6 +245,7 @@ initPresence();
 var st={text:'',img:null,bgPreset:0,color:'#FFFFFF',ov:.45,ratio:'p',recording:false,progress:0,cur:1,phase:'idle'};
 var range={s:1,r:'yasser',from:1,to:1,texts:[],durations:[],total:0,ready:false};
 var textCache={},metaCache={},imgUrl=null,resUrl=null,ac=null;
+var shareVideoBtn=$('shareVideo');
 var wordSync=true, currentWord=-1;
 var prepToken=0,prepCtrl=null,confirmed=false,lastLayout=null,timeline=[];
 var textGate=0;
@@ -797,9 +799,10 @@ function onStop(){
   var d=$('dl');
   d.href=resUrl;
   d.download='ayah-'+range.s+'-'+range.from+(range.to>range.from?'-'+range.to:'')+'.'+ext;
+  shareVideoBtn.hidden=!(navigator.share&&navigator.canShare);
   $('result').style.display='block';
-  if(ext==='webm')say('تم إنشاء الفيديو بصيغة WebM. قد لا يعمل في بعض إصدارات واتساب أو إنستغرام؛ إذا احتجت MP4 بترميز H.264/AAC فحوّله بأداة موثوقة قبل المشاركة.');
-  else say('تم إنشاء الفيديو بصيغة MP4. تحقق من تشغيله على جهازك قبل مشاركته.');
+  if(ext==='webm')say('تم إنشاء الفيديو. على Android ستجده في «التنزيلات»؛ اضغط «حفظ أو مشاركة الفيديو» لإرساله إلى الصور أو واتساب.');
+  else say('تم إنشاء الفيديو. اضغط «حفظ أو مشاركة الفيديو» لإرساله إلى الصور أو واتساب، أو استخدم زر التحميل.');
   $('result').scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
@@ -820,6 +823,15 @@ $('full').addEventListener('click',function(){
 selR.addEventListener('change',prepare);
 $('wordSync').addEventListener('change',function(e){wordSync=!!e.target.checked;$('syncNote').hidden=!wordSync;currentWord=-1;lastLayout=null;draw()});
 $('retry').addEventListener('click',prepare);
+shareVideoBtn.addEventListener('click',function(){
+  if(!resUrl||!navigator.share)return;
+  fetch(resUrl).then(function(r){return r.blob()}).then(function(blob){
+    var name='ayah-'+range.s+'-'+range.from+(range.to>range.from?'-'+range.to:'')+'.'+(blob.type.indexOf('mp4')>-1?'mp4':'webm');
+    var file=new File([blob],name,{type:blob.type||'video/webm'});
+    if(navigator.canShare&&navigator.canShare({files:[file]}))return navigator.share({files:[file],title:'مقطع آية',text:'فيديو آية من موقع مقطع آية'});
+    say('استخدم زر التحميل، ثم افتح تطبيق «الملفات» > «التنزيلات» لنقل الفيديو إلى الصور.',true);
+  }).catch(function(err){if(err&&err.name!=='AbortError')say('تعذر فتح المشاركة. استخدم زر التحميل ثم افتح مجلد «التنزيلات».',true)});
+});
 $('ov').addEventListener('input',function(e){st.ov=e.target.value/100;lastLayout=null;draw()});
 function seg(id,attr,fn){
   $(id).addEventListener('click',function(e){
