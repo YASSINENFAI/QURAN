@@ -19,11 +19,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<meta property="og:locale" content="ar_AR">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 <style>
 :root{--bg:#ECEFEA;--panel:#F8F9F6;--ink:#14302B;--mute:#5B6D68;--line:#C9D2CB;--green:#14564B;--green2:#0E3F37;--brass:#A97C2F;--err:#9B2C2C}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.7 "IBM Plex Sans Arabic",system-ui,sans-serif}
+body{margin:0;min-height:100vh;background:radial-gradient(1200px 600px at 85% -10%,rgba(20,86,75,.10),transparent 60%),radial-gradient(900px 500px at -10% 110%,rgba(169,124,47,.10),transparent 60%),var(--bg);color:var(--ink);font:400 16px/1.7 "IBM Plex Sans Arabic",system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
 header{max-width:1100px;margin:0 auto;padding:18px 20px 10px}
 .sitebar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 0 16px;border-bottom:1px solid var(--line)}
 .brand{display:inline-flex;align-items:center;gap:12px;min-width:0;color:var(--green);text-decoration:none}
@@ -39,18 +40,24 @@ header{max-width:1100px;margin:0 auto;padding:18px 20px 10px}
 header p{margin:14px 0 0;color:var(--mute);max-width:620px;line-height:1.9}
 @media(max-width:520px){header{padding:10px 12px 8px}.sitebar{gap:8px;padding:8px 0 12px}.brand{gap:7px}.brand-mark{width:43px;height:43px}.brand-name{font-size:24px}.header-actions{gap:6px}.telegram-link{width:42px;height:42px;min-height:42px;padding:9px;border-radius:11px}.report-link{width:42px;height:42px;min-height:42px;padding:9px;border-radius:11px}.telegram-link svg,.report-link svg{width:21px;height:21px}.telegram-label,.report-label{display:none}header p{font-size:14px;margin-top:10px}}
 main{max-width:1100px;margin:0 auto;padding:20px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,440px);gap:28px;align-items:start}
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:0 1px 2px rgba(20,48,43,.04),0 10px 30px rgba(20,48,43,.07)}
 fieldset{border:0;margin:0;padding:0;display:grid;gap:16px}
 label,.lbl{display:block;font-weight:600;font-size:15px;margin-bottom:6px}
-select,input[type=file]{width:100%;font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
+select,input[type=file]{width:100%;font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);transition:border-color .15s,box-shadow .15s}
+select{min-height:46px;cursor:pointer}
+select:hover,input[type=file]:hover{border-color:#9FB2A8}
+select:focus,input[type=file]:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(20,86,75,.14);outline:none}
+input[type=file]::file-selector-button{font:600 14px "IBM Plex Sans Arabic",sans-serif;margin-inline-end:10px;padding:6px 12px;border:0;border-radius:8px;background:#E4ECE6;color:var(--green);cursor:pointer}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
-.seg button{flex:1;border:0;background:none;padding:9px 6px;font:inherit;color:var(--mute);cursor:pointer}
+.seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+.seg button{flex:1;border:0;background:none;padding:10px 6px;min-height:44px;font:inherit;color:var(--mute);cursor:pointer;transition:background .15s,color .15s}
+.seg button:hover:not([aria-pressed=true]){background:#EFF4EF;color:var(--ink)}
 .seg button+button{border-inline-start:1px solid var(--line)}
 .seg button[aria-pressed=true]{background:var(--green);color:#fff}
 .background-picker{display:grid;gap:8px}
 .bg-presets{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
-.bg-choice{min-width:0;padding:5px 4px 7px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);font:500 12px/1.4 "IBM Plex Sans Arabic",sans-serif;cursor:pointer}
+.bg-choice{min-width:0;padding:5px 4px 7px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);font:500 12px/1.4 "IBM Plex Sans Arabic",sans-serif;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.bg-choice:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(20,48,43,.10)}
 .bg-choice[aria-pressed=true]{border:2px solid var(--brass);padding:4px 3px 6px;box-shadow:0 0 0 1px rgba(169,124,47,.15)}
 .bg-swatch{display:block;height:54px;border-radius:6px;margin-bottom:5px;border:1px solid rgba(255,255,255,.25)}
 .bg-emerald{background:radial-gradient(circle at 50% 45%,#287968,#0A2925 80%)}
@@ -61,12 +68,14 @@ select,input[type=file]{width:100%;font:inherit;padding:10px 12px;border:1px sol
 .upload-label{margin-top:5px}
 @media(max-width:420px){.bg-presets{grid-template-columns:repeat(3,minmax(0,1fr))}.bg-swatch{height:48px}}
 .sw{display:flex;gap:10px}
-.sw button{width:38px;height:38px;border-radius:50%;border:2px solid var(--line);cursor:pointer;padding:0}
+.sw button{width:40px;height:40px;border-radius:50%;border:2px solid var(--line);cursor:pointer;padding:0;transition:transform .15s}
+.sw button:hover{transform:scale(1.08)}
 .sw button[aria-pressed=true]{outline:3px solid var(--brass);outline-offset:2px}
 input[type=range]{width:100%;accent-color:var(--green)}
-.go{width:100%;border:0;border-radius:10px;background:var(--green);color:#fff;font:600 18px "IBM Plex Sans Arabic",sans-serif;padding:14px;cursor:pointer}
-.go:hover:not(:disabled){background:var(--green2)}
-.go:disabled{opacity:.5;cursor:not-allowed}
+.go{width:100%;border:0;border-radius:12px;background:linear-gradient(180deg,#1A6A5C,var(--green));color:#fff;font:600 18px "IBM Plex Sans Arabic",sans-serif;padding:14px;cursor:pointer;box-shadow:0 6px 16px rgba(20,86,75,.22);transition:background .15s,transform .15s,box-shadow .15s}
+.go:hover:not(:disabled){background:var(--green2);transform:translateY(-1px)}
+.go:active:not(:disabled){transform:none}
+.go:disabled{opacity:.5;cursor:not-allowed;box-shadow:none}
 .mini{align-self:start;justify-self:start;border:1px solid var(--line);background:#fff;color:var(--green);font:600 14px "IBM Plex Sans Arabic",sans-serif;padding:8px 14px;border-radius:8px;cursor:pointer}
 .mini:hover{background:#EFF4EF}
 .mini:disabled{opacity:.5;cursor:not-allowed}
@@ -100,8 +109,13 @@ input[type=range]{width:100%;accent-color:var(--green)}
 #result{display:none;width:100%;text-align:center}
 #result video{max-width:100%;max-height:60vh;border-radius:12px;background:#000}
 #result a{display:block;margin-top:12px;text-decoration:none;text-align:center}
+#result .go+.go{margin-top:10px}
+.check{display:flex;align-items:center;gap:8px;cursor:pointer}
+.check input{width:18px;height:18px;margin:0;accent-color:var(--green)}
 footer{max-width:1100px;margin:0 auto;padding:10px 20px 40px;color:var(--mute);font-size:13.5px}
-@media(max-width:860px){main{grid-template-columns:1fr}.stage{position:static;order:-1}}
+@media(max-width:860px){main{grid-template-columns:1fr}.stage{position:static;order:-1}#cv{max-height:56vh}}
+@media(max-width:520px){main{padding:12px;gap:16px}.panel{padding:16px}.row{gap:10px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
@@ -152,7 +166,7 @@ footer{max-width:1100px;margin:0 auto;padding:10px 20px 40px;color:var(--mute);f
 </div>
 <button type="button" class="mini" id="full">السورة كاملة</button>
 <div class="background-picker">
-<label>اختر خلفية</label>
+<span class="lbl">اختر خلفية</span>
 <div class="bg-presets" id="bgPresets" role="group" aria-label="الخلفيات الجاهزة">
 <button type="button" class="bg-choice" data-bg="0" aria-pressed="true"><span class="bg-swatch bg-emerald"></span><span>أخضر إسلامي</span></button>
 <button type="button" class="bg-choice" data-bg="1" aria-pressed="false"><span class="bg-swatch bg-night"></span><span>سماء ليلية</span></button>
@@ -179,7 +193,7 @@ footer{max-width:1100px;margin:0 auto;padding:10px 20px 40px;color:var(--mute);f
 </div></div>
 <div><label for="ov">عتمة الخلفية</label><input id="ov" type="range" min="0" max="85" value="45"></div>
 </div>
-<div><label><input id="wordSync" type="checkbox" checked> مزامنة الكلمات</label><small id="syncNote" class="wake">المزامنة تقريبية لجميع القراء حالياً</small></div>
+<div><label class="check"><input id="wordSync" type="checkbox" checked> مزامنة الكلمات</label><small id="syncNote" class="wake">المزامنة تقريبية لجميع القراء حالياً</small></div>
 <div id="dur" class="dur" aria-live="polite"></div>
 <div id="warn" class="warn" role="alert" hidden></div>
 <button class="go" id="go" type="button" disabled>إنشاء الفيديو</button>
@@ -222,7 +236,8 @@ var selS=$('surah'),selF=$('ayahFrom'),selT=$('ayahTo'),selR=$('reciter'),go=$('
 var durEl=$('dur'),warnEl=$('warn'),progEl=$('prog'),pfill=$('pfill'),pctEl=$('pct'),remainEl=$('remain'),pnowEl=$('pnow'),wakeEl=$('wake'),cancelBtn=$('cancel');
 function initPresence(){
   var box=$('presence'),label=$('presenceText');
-  if(!box||!label||!window.supabase){box.className='presence is-error';label.textContent='تعذر تحميل عداد المتصلين';return}
+  if(!box||!label)return;
+  if(!window.supabase){box.className='presence is-error';label.textContent='تعذر تحميل عداد المتصلين';return}
   try{
     var client=window.supabase.createClient('https://zavuepkvvnfisykuloez.supabase.co','sb_publishable_xtT9fzK88A6qGVFwva1acQ_QdGrnWYv');
     recordVisit(client);
@@ -250,7 +265,8 @@ function recordVisit(client){
     });
   }catch(e){}
 }
-initPresence();
+// المكتبة تُحمَّل مع defer حتى لا تؤخر ظهور الصفحة، فننتظرها قبل التهيئة
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initPresence);else initPresence();
 var st={text:'',img:null,bgPreset:0,color:'#FFFFFF',ov:.45,ratio:'p',recording:false,progress:0,cur:1,phase:'idle'};
 var range={s:1,r:'yasser',from:1,to:1,texts:[],durations:[],total:0,ready:false};
 var textCache={},metaCache={},imgUrl=null,resUrl=null,ac=null;
@@ -464,8 +480,8 @@ function draw(){
   var text=st.text||(st.phase==='error'?'تعذر تحميل النص':'جارٍ تحميل النص…');
   var L=layout(text,w,h);
   ctx.font=L.size+'px "Amiri Quran",serif';ctx.fillStyle=st.color;ctx.shadowColor='rgba(0,0,0,.35)';ctx.shadowBlur=m*.012;
-  var active=wordSync&&st.recording?currentWord:-1,flat=0;
-  L.positions.forEach(function(row){row.forEach(function(p){ctx.globalAlpha=wordSync&&st.recording&&active>=0&&flat>active?.38:1;ctx.fillStyle=(wordSync&&st.recording&&flat===active)?'#F2D58A':st.color;ctx.fillText(p.word,p.x,p.y);flat++})});ctx.globalAlpha=1;ctx.shadowBlur=0;
+  var active=wordSync&&st.recording?currentWord:-1,flat=0,hl=st.color==='#F2D58A'?'#FFFFFF':'#F2D58A';
+  L.positions.forEach(function(row){row.forEach(function(p){ctx.globalAlpha=wordSync&&st.recording&&active>=0&&flat>active?.38:1;ctx.fillStyle=(wordSync&&st.recording&&flat===active)?hl:st.color;ctx.fillText(p.word,p.x,p.y);flat++})});ctx.globalAlpha=1;ctx.shadowBlur=0;
   var label;
   if(st.recording){
     label='سورة '+NAMES[range.s-1]+' • الآية '+ar(st.cur||range.from);
