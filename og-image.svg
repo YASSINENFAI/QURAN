@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">مقطع آية</title>
+  <desc id="desc">أداة إنشاء فيديو من آيات القرآن</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0A2925"/>
+      <stop offset="0.55" stop-color="#14564B"/>
+      <stop offset="1" stop-color="#A97C2F"/>
+    </linearGradient>
+    <pattern id="pattern" width="72" height="72" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <path d="M36 8v56M8 36h56" stroke="#E3C16F" stroke-opacity=".12" stroke-width="2"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#pattern)"/>
+  <circle cx="930" cy="145" r="160" fill="#E3C16F" fill-opacity=".1"/>
+  <rect x="92" y="96" width="126" height="126" rx="30" fill="#F8F9F6" fill-opacity=".96"/>
+  <path d="M155 116l9 17 18 9-18 9-9 18-9-18-18-9 18-9z" fill="#A97C2F"/>
+  <path d="M155 151c-23 0-40 18-40 41l-12 4v18l12 6v12l40 22 40-22v-12l12-6v-18l-12-4c0-23-17-41-40-41z" fill="none" stroke="#14564B" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M104 193l51 45 51-45v22l-51 38-51-38z" fill="#14564B"/>
+  <path d="M127 186v24M141 174v42M155 166v58M169 174v42M183 186v24" stroke="#A97C2F" stroke-width="5" stroke-linecap="round"/>
+  <text x="92" y="340" fill="#F8F9F6" font-family="Arial, sans-serif" font-size="76" font-weight="700" direction="rtl">مقطع آية</text>
+  <text x="92" y="420" fill="#E3C16F" font-family="Arial, sans-serif" font-size="38" direction="rtl">إنشاء فيديو من آيات القرآن</text>
+  <text x="92" y="490" fill="#F8F9F6" fill-opacity=".82" font-family="Arial, sans-serif" font-size="27" direction="rtl">اختر السورة والقارئ والخلفية — وأنشئ مقطعك مباشرة من المتصفح</text>
+</svg>

@@ -5,21 +5,51 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>مقطع آية: اصنع فيديو من نطاق آيات بصوت قارئك المفضل</title>
 <meta name="description" content="اختر نطاق الآيات أو السورة كاملة والقارئ وارفع صورة الخلفية، ثم حمّل فيديو جاهز للمشاركة. يعمل بالكامل في المتصفح ومجاني.">
+<meta name="keywords" content="إنشاء فيديو قرآن,فيديو آيات القرآن,تلاوات القرآن,فيديو قرآني,مقطع آية">
 <link rel="canonical" href="https://quran-droxai.vercel.app/">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://quran-droxai.vercel.app/">
 <meta property="og:site_name" content="مقطع آية">
 <meta property="og:title" content="مقطع آية - إنشاء فيديو من آيات القرآن">
 <meta property="og:description" content="أنشئ فيديو لآيات القرآن بصوت القارئ والخلفية التي تختارها، مباشرة من المتصفح.">
+<meta property="og:image" content="https://quran-droxai.vercel.app/og-image.svg">
+<meta property="og:image:alt" content="مقطع آية - أداة إنشاء فيديو من آيات القرآن">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="مقطع آية - إنشاء فيديو من آيات القرآن">
 <meta name="twitter:description" content="أنشئ فيديو لآيات القرآن بصوت القارئ والخلفية التي تختارها، مباشرة من المتصفح.">
+<meta name="twitter:image" content="https://quran-droxai.vercel.app/og-image.svg">
+<meta name="twitter:image:alt" content="مقطع آية - أداة إنشاء فيديو من آيات القرآن">
 <meta name="theme-color" content="#14564B">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2314564B'/%3E%3Cpath d='M32 14l5 13 13 5-13 5-5 13-5-13-13-5 13-5z' fill='%23E3C16F'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
 <meta property="og:locale" content="ar_AR">
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"WebApplication",
+  "name":"مقطع آية",
+  "url":"https://quran-droxai.vercel.app/",
+  "description":"أداة مجانية لإنشاء فيديو من آيات القرآن بصوت القارئ والخلفية التي يختارها المستخدم.",
+  "applicationCategory":"MultimediaApplication",
+  "operatingSystem":"Any",
+  "inLanguage":"ar",
+  "isAccessibleForFree":true,
+  "featureList":["اختيار السورة والآيات","اختيار قارئ القرآن","إضافة خلفية للفيديو","تصدير الفيديو من المتصفح"]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"FAQPage",
+  "mainEntity":[
+    {"@type":"Question","name":"كيف أنشئ فيديو من آيات القرآن؟","acceptedAnswer":{"@type":"Answer","text":"اختر السورة ونطاق الآيات والقارئ، ثم اختر الخلفية وأبعاد الفيديو واضغط على زر إنشاء الفيديو."}},
+    {"@type":"Question","name":"هل يتم رفع الآيات أو الصور إلى خادم؟","acceptedAnswer":{"@type":"Answer","text":"يتم إنشاء الفيديو داخل جهازك في المتصفح، ولا تُرفع صورة الخلفية أو الفيديو الناتج إلى خادم."}},
+    {"@type":"Question","name":"هل يمكن اختيار السورة كاملة؟","acceptedAnswer":{"@type":"Answer","text":"نعم، يمكنك اختيار أي سورة ثم الضغط على خيار السورة كاملة لإنشاء فيديو للنطاق الكامل."}}
+  ]
+}
+</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 <style>
 :root{--bg:#ECEFEA;--panel:#F8F9F6;--ink:#14302B;--mute:#5B6D68;--line:#C9D2CB;--green:#14564B;--green2:#0E3F37;--brass:#A97C2F;--err:#9B2C2C}
@@ -113,6 +143,11 @@ input[type=range]{width:100%;accent-color:var(--green)}
 .check{display:flex;align-items:center;gap:8px;cursor:pointer}
 .check input{width:18px;height:18px;margin:0;accent-color:var(--green)}
 footer{max-width:1100px;margin:0 auto;padding:10px 20px 40px;color:var(--mute);font-size:13.5px}
+.seo-content{max-width:1100px;margin:0 auto;padding:4px 20px 24px;color:var(--ink)}
+.seo-content h2{margin:12px 0 8px;font-size:clamp(22px,3vw,30px);color:var(--green)}
+.seo-content h3{margin:18px 0 4px;font-size:18px;color:var(--green2)}
+.seo-content p{max-width:850px;margin:0;color:var(--mute);line-height:1.9}
+.seo-content ul{max-width:850px;margin:8px 0 0;padding-inline-start:22px;color:var(--mute);line-height:1.9}
 @media(max-width:860px){main{grid-template-columns:1fr}.stage{position:static;order:-1}#cv{max-height:56vh}}
 @media(max-width:520px){main{padding:12px;gap:16px}.panel{padding:16px}.row{gap:10px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
@@ -219,6 +254,22 @@ footer{max-width:1100px;margin:0 auto;padding:10px 20px 40px;color:var(--mute);f
 </div>
 </section>
 </main>
+<section class="seo-content" aria-labelledby="about-title">
+<h2 id="about-title">إنشاء فيديو من آيات القرآن بسهولة</h2>
+<p>مقطع آية أداة عربية مجانية تساعدك على تحويل آيات القرآن الكريم إلى فيديو قصير قابل للمشاركة. اختر السورة والآيات، ثم حدّد القارئ والخلفية وأبعاد الفيديو، وسيتم تجهيز المقطع مباشرة داخل المتصفح.</p>
+<h3>مميزات أداة مقطع آية</h3>
+<ul>
+<li>اختيار أي سورة وتحديد آية واحدة أو نطاق من الآيات أو السورة كاملة.</li>
+<li>الاستماع إلى تلاوات مجموعة من القرّاء مع مزامنة تقريبية للكلمات.</li>
+<li>اختيار خلفية جاهزة أو رفع صورة من جهازك وتحديد أبعاد الفيديو.</li>
+<li>إنشاء الفيديو محليًا في جهازك دون رفع صورة الخلفية أو الفيديو الناتج.</li>
+</ul>
+<h3>أسئلة شائعة</h3>
+<h3>كيف أنشئ فيديو من آيات القرآن؟</h3>
+<p>اختر السورة ونطاق الآيات والقارئ، ثم اختر الخلفية وأبعاد الفيديو واضغط على «إنشاء الفيديو».</p>
+<h3>هل يمكن اختيار السورة كاملة؟</h3>
+<p>نعم، اختر السورة المطلوبة واضغط على «السورة كاملة» قبل إنشاء الفيديو.</p>
+</section>
 <footer>لا يوجد حد أقصى لمدة الفيديو؛ المدة تعتمد على النطاق المختار فقط. يتم الإنشاء داخل جهازك ولا يُرفع إلى أي خادم. نص الآيات من alquran.cloud والتلاوات من everyayah.com. أبقِ الصفحة مفتوحة وظاهرة أثناء الإنشاء، ووصّل الجهاز بالشاحن في النطاقات الطويلة.</footer>
 <script>
 (function(){
