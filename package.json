@@ -1,0 +1,20 @@
+{
+  "name": "quran-ayah-video-creator",
+  "version": "1.0.0",
+  "description": "Quran verse video creator with audio and visuals",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "keywords": [
+    "quran",
+    "video",
+    "audio",
+    "verses"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@vercel/analytics": "^1.1.1"
+  }
+}
