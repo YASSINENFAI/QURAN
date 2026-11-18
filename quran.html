@@ -543,7 +543,7 @@ function renderBlob(i){
   paint(c.getContext('2d'),pages[i],i,pages.length);
   return new Promise(function(res,rej){c.toBlob(function(b){b?res(b):rej(new Error('blob'))},opt.fmt==='jpg'?'image/jpeg':'image/png',.93)});
 }
-var RESULT={shared:'تم الحفظ/المشاركة.',downloaded:'تم تحميل الملف. ستجده في مجلد «التنزيلات».',preview:'',cancelled:''};
+var RESULT={shared:'تم الحفظ/المشاركة.',downloaded:'تم التحميل في مجلد «التنزيلات» (Downloads).',preview:'',cancelled:''};
 function done(r){say(RESULT[r]||'')}
 $('dlOne').onclick=function(){
   if(!pages.length||busy)return;
