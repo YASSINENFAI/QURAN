@@ -7,7 +7,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const SITE = 'https://quran-droxai.vercel.app';
+const SITE = 'https://quran-gamma-orpin.vercel.app';
 const DATE = process.argv[2] || new Date().toISOString().slice(0, 10);
 const AR = '٠١٢٣٤٥٦٧٨٩';
 const ar = (n) => String(n).replace(/\d/g, (d) => AR[d]);

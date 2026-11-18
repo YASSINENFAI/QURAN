@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://quran-droxai.vercel.app/sitemap.xml
+Sitemap: https://quran-gamma-orpin.vercel.app/sitemap.xml
