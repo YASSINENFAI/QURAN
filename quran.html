@@ -20,6 +20,7 @@
 <link rel="preconnect" href="https://api.alquran.cloud" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/site.css">
+<script src="/save.js"></script>
 <style>
 .search{display:grid;gap:12px}
 .search form{display:flex;gap:10px}
@@ -542,31 +543,32 @@ function renderBlob(i){
   paint(c.getContext('2d'),pages[i],i,pages.length);
   return new Promise(function(res,rej){c.toBlob(function(b){b?res(b):rej(new Error('blob'))},opt.fmt==='jpg'?'image/jpeg':'image/png',.93)});
 }
-function save(blob,name){
-  var u=URL.createObjectURL(blob),a=document.createElement('a');
-  a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();
-  setTimeout(function(){URL.revokeObjectURL(u)},4000);
-}
+var RESULT={shared:'تم الحفظ/المشاركة.',downloaded:'تم تحميل الملف. ستجده في مجلد «التنزيلات».',preview:'',cancelled:''};
+function done(r){say(RESULT[r]||'')}
 $('dlOne').onclick=function(){
   if(!pages.length||busy)return;
-  renderBlob(page).then(function(b){save(b,fileName(pages[page],page,pages.length));say('تم تحميل الصورة.')}).catch(function(){say('تعذر إنشاء الصورة.',true)});
+  // نرسم الصورة مباشرة عند الضغط ليبقى طلب المشاركة ضمن مهلة تفاعل المستخدم
+  renderBlob(page).then(function(b){return AyaSave.save(b,fileName(pages[page],page,pages.length))}).then(done).catch(function(){say('تعذر إنشاء الصورة.',true)});
 };
 $('dlAll').onclick=function(){
   if(!pages.length||busy)return;
-  busy=true;var files=[],i=0,n=pages.length;
+  busy=true;var items=[],i=0,n=pages.length;
   (function next(){
     if(i>=n){
-      save(zip(files),'surah-'+sel.s+'-'+NAMES[sel.s-1]+'-'+n+'-images.zip');
-      busy=false;say('تم تجهيز '+ar(n)+' صورة في ملف ZIP واحد.');return;
+      busy=false;say('');
+      AyaSave.saveMany(items,function(){
+        return zip(items.map(function(it){return {name:it.name,data:it.data}}));
+      },'surah-'+sel.s+'-'+n+'-images.zip').then(done).catch(function(){say('تعذر حفظ الصور.',true)});
+      return;
     }
     say('جارٍ تجهيز الصور… '+ar(i+1)+' / '+ar(n));
-    renderBlob(i).then(function(b){return b.arrayBuffer()}).then(function(buf){
-      files.push({name:fileName(pages[i],i,n),data:new Uint8Array(buf)});i++;setTimeout(next,0);
+    renderBlob(i).then(function(b){return b.arrayBuffer().then(function(buf){return {b:b,buf:buf}})}).then(function(r){
+      items.push({blob:r.b,name:fileName(pages[i],i,n),data:new Uint8Array(r.buf)});i++;setTimeout(next,0);
     }).catch(function(){busy=false;say('تعذر إنشاء بعض الصور. جرّب صيغة JPG أو نطاقاً أقصر.',true)});
   })();
 };
 var shareBtn=$('share');
-shareBtn.hidden=!(navigator.share&&navigator.canShare);
+shareBtn.hidden=!(navigator.share&&navigator.canShare)||AyaSave.mobile;
 shareBtn.onclick=function(){
   if(!pages.length)return;
   renderBlob(page).then(function(b){

@@ -51,6 +51,7 @@
 }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<script src="/save.js"></script>
 <style>
 :root{--bg:#ECEFEA;--panel:#F8F9F6;--ink:#14302B;--mute:#5B6D68;--line:#C9D2CB;--green:#14564B;--green2:#0E3F37;--brass:#A97C2F;--err:#9B2C2C}
 *{box-sizing:border-box}
@@ -327,7 +328,7 @@ function recordVisit(client){
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initPresence);else initPresence();
 var st={text:'',img:null,vid:null,bgPreset:0,color:'#FFFFFF',ov:.45,ratio:'p',recording:false,progress:0,cur:1,phase:'idle'};
 var range={s:1,r:'yasser',from:1,to:1,texts:[],durations:[],total:0,ready:false};
-var textCache={},metaCache={},imgUrl=null,resUrl=null,ac=null;
+var textCache={},metaCache={},imgUrl=null,resUrl=null,resBlob=null,ac=null;
 var shareVideoBtn=$('shareVideo');
 var wordSync=true, currentWord=-1;
 var prepToken=0,prepCtrl=null,confirmed=false,lastLayout=null,timeline=[];
@@ -881,7 +882,7 @@ function onStop(){
     return;
   }
   if(resUrl)URL.revokeObjectURL(resUrl);
-  resUrl=URL.createObjectURL(blob);
+  resUrl=URL.createObjectURL(blob);resBlob=blob;
   $('vid').src=resUrl;
   var ext=type.indexOf('mp4')>-1?'mp4':'webm';
   var d=$('dl');
@@ -912,13 +913,18 @@ selR.addEventListener('change',prepare);
 $('wordSync').addEventListener('change',function(e){wordSync=!!e.target.checked;$('syncNote').hidden=!wordSync;currentWord=-1;lastLayout=null;draw()});
 $('retry').addEventListener('click',prepare);
 shareVideoBtn.addEventListener('click',function(){
-  if(!resUrl||!navigator.share)return;
-  fetch(resUrl).then(function(r){return r.blob()}).then(function(blob){
-    var name='ayah-'+range.s+'-'+range.from+(range.to>range.from?'-'+range.to:'')+'.'+(blob.type.indexOf('mp4')>-1?'mp4':'webm');
-    var file=new File([blob],name,{type:blob.type||'video/webm'});
-    if(navigator.canShare&&navigator.canShare({files:[file]}))return navigator.share({files:[file],title:'مقطع آية',text:'فيديو آية من موقع مقطع آية'});
-    say('استخدم زر التحميل، ثم افتح تطبيق «الملفات» > «التنزيلات» لنقل الفيديو إلى الصور.',true);
-  }).catch(function(err){if(err&&err.name!=='AbortError')say('تعذر فتح المشاركة. استخدم زر التحميل ثم افتح مجلد «التنزيلات».',true)});
+  if(!resBlob||!navigator.share)return;
+  // المشاركة مباشرة من الملف المحفوظ في الذاكرة حتى لا تنتهي مهلة ضغطة المستخدم (Safari)
+  var name=$('dl').download||'ayah.mp4';
+  var file=new File([resBlob],name,{type:resBlob.type||'video/webm'});
+  if(!(navigator.canShare&&navigator.canShare({files:[file]}))){say('استخدم زر التحميل، ثم افتح تطبيق «الملفات» > «التنزيلات» لنقل الفيديو إلى الصور.',true);return}
+  navigator.share({files:[file],title:'مقطع آية'}).catch(function(err){if(err&&err.name!=='AbortError')say('تعذر فتح المشاركة. استخدم زر التحميل.',true)});
+});
+// روابط blob مع download لا تعمل على iPhone ومتصفحات التطبيقات، فنستخدم مسار الحفظ البديل هناك
+$('dl').addEventListener('click',function(e){
+  if(!resBlob||!window.AyaSave||!(AyaSave.inApp||AyaSave.ios))return;
+  e.preventDefault();
+  AyaSave.save(resBlob,$('dl').download||'ayah.mp4').then(function(r){if(r==='shared')say('تم حفظ الفيديو.')});
 });
 $('ov').addEventListener('input',function(e){st.ov=e.target.value/100;lastLayout=null;draw()});
 function seg(id,attr,fn){
