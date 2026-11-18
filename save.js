@@ -84,9 +84,9 @@ function overlay(blob,name,files,opts){
       return '<a href="'+u+'" download="'+esc(g.name)+'" title="'+esc(g.name)+'"><img src="'+u+'" alt="'+esc(g.name)+'" loading="lazy"></a>';
     }).join('')+'</div>';
   }else media=isVid?'<video src="'+url+'" controls playsinline></video>':isImg?'<img src="'+url+'" alt="'+esc(name)+'">':'<p style="font-size:18px">'+esc(opts.label||('الملف جاهز: '+name))+'</p>';
-  var first=gallery?'اضغط على أي صورة لتحميلها وحدها، أو اضغط عليها مطوّلاً ثم «حفظ الصورة».':
+  var first=gallery?(MOBILE?'اضغط على أي صورة لتحميلها وحدها، أو اضغط عليها مطوّلاً ثم «حفظ الصورة».':'انقر على أي صورة لتحميلها وحدها، أو حمّل الكل في ملف ZIP.'):
     shareable?'الأسهل: اضغط «حفظ في الصور» ثم اختر '+(isVid?'«حفظ الفيديو»':'«حفظ الصورة»')+'.':
-    isImg?'اضغط مطوّلاً على الصورة ثم اختر «حفظ الصورة» أو «تنزيل الصورة».':'';
+    isImg?(MOBILE?'اضغط مطوّلاً على الصورة ثم اختر «حفظ الصورة» أو «تنزيل الصورة».':'اضغط «تحميل»، أو انقر بالزر الأيمن على الصورة ثم «حفظ الصورة باسم».'):'';
   ov.innerHTML=media+(first?'<p>'+first+'</p>':'')+'<p style="opacity:.8;font-size:14px">'+whereTip(isVid)+'</p>'+
     (IN_APP?'<p style="opacity:.85;font-size:14px">إن لم يعمل الحفظ داخل هذا التطبيق: '+hint()+'</p>':'')+
     '<div class="ays-row">'+(shareable?'<button type="button" class="ays-p" data-ays="share">حفظ في الصور / مشاركة</button>':'')+
@@ -94,63 +94,42 @@ function overlay(blob,name,files,opts){
     '<button type="button" data-ays="x">إغلاق</button></div>';
   ov.addEventListener('click',function(e){
     var b=e.target.closest('[data-ays]'),k=b&&b.getAttribute('data-ays');
+    var a=e.target.closest('a[download]');
+    if(a){toast(a.getAttribute('download'),isVid);return}
     if(k==='copy'){copyLink(b);return}
     // ضغطة جديدة من المستخدم، فلا تُرفض المشاركة لانتهاء مهلة التفاعل
-    if(k==='share'){navigator.share({files:files}).catch(function(){});return}
-    if(k==='x'||e.target===ov){ov.remove();setTimeout(function(){urls.forEach(function(u){URL.revokeObjectURL(u)})},1000)}
+    if(k==='share'){navigator.share({files:files}).then(function(){b.textContent='✓ تم الحفظ/المشاركة'},function(){});return}
+    if(k==='x'||e.target===ov){ov.remove();setTimeout(function(){urls.forEach(function(u){URL.revokeObjectURL(u)})},120000)}
   });
   document.body.appendChild(ov);
+  var focus=ov.querySelector('.ays-p');if(focus)focus.focus();
   return 'preview';
 }
 
-/* إشعار بعد التحميل على الكمبيوتر يوضّح مكان الملف */
-function toast(name){
+/* إشعار بعد التحميل يوضّح مكان الملف */
+function toast(name,isVid){
   var old=document.querySelector('.ays-toast');if(old)old.remove();
   var t=document.createElement('div');t.className='ays-toast';t.setAttribute('role','status');
-  t.innerHTML='<b>✓ تم التحميل:</b> '+esc(name)+'<br><span>'+whereTip(false).replace('بعد «تحميل» ','')+'</span><button type="button" aria-label="إغلاق">✕</button>';
+  t.innerHTML='<b>✓ جارٍ التحميل:</b> '+esc(name)+'<br><span>'+whereTip(isVid).replace('بعد «تحميل» ','')+'</span><button type="button" aria-label="إغلاق">✕</button>';
   t.querySelector('button').onclick=function(){t.remove()};
   document.body.appendChild(t);
-  setTimeout(function(){if(t.parentNode)t.remove()},9000);
-}
-
-function share(files){
-  return navigator.share({files:files}).then(function(){return 'shared'},function(err){
-    return err&&err.name==='AbortError'?'cancelled':null;
-  });
+  setTimeout(function(){if(t.parentNode)t.remove()},10000);
 }
 
 /**
- * يحفظ ملفاً واحداً. على الجوال: نافذة المشاركة أولاً (حفظ مباشر في الصور)، وإن أُغلقت أو لم تتوفر
- * تظهر نافذة الحفظ بدل تنزيل صامت لا يجده المستخدم. على الكمبيوتر: تحميل عادي مع إشعار بمكان الملف.
+ * زر التحميل يفتح دائماً نافذة الحفظ (على كل الأجهزة) بدل تنزيل صامت:
+ * معاينة، «حفظ في الصور» حيث تتوفر المشاركة، «تحميل»، ومكان الملف بعد التحميل.
  */
 function save(blob,name){
-  var f=toFile(blob,name),files=f?[f]:null;
-  var p=(MOBILE&&canShareFiles(files))?share(files):Promise.resolve(null);
-  return p.then(function(r){
-    if(r==='shared')return r;
-    if(MOBILE||IN_APP)return overlay(blob,name,files);
-    var url=URL.createObjectURL(blob);
-    anchor(url,name);
-    // لا نلغي الرابط مبكراً: بعض المتصفحات تبدأ التحميل بعد تأكيد المستخدم
-    setTimeout(function(){URL.revokeObjectURL(url)},120000);
-    toast(name);
-    return 'downloaded';
-  });
+  var f=toFile(blob,name);
+  return Promise.resolve(overlay(blob,name,f?[f]:null));
 }
-/** عدة صور: على الجوال مشاركة دفعة واحدة أو معرض صور قابل للحفظ؛ على الكمبيوتر ملف ZIP. */
+/** عدة صور: معرض للصور نفسها (كل صورة قابلة للتحميل) مع زر ZIP للكل. */
 function saveMany(items,fallback,fallbackName){
   var files=[];
   items.forEach(function(it){var f=toFile(it.blob,it.name);if(f)files.push(f)});
   var all=files.length===items.length?files:null;
-  if(MOBILE||IN_APP){
-    var p=canShareFiles(all)?share(all):Promise.resolve(null);
-    return p.then(function(r){
-      if(r==='shared')return r;
-      // ملف ZIP لا يظهر في المعرض، لذلك نعرض الصور نفسها
-      return overlay(fallback(),fallbackName,all,{gallery:items,label:'تم تجهيز '+items.length+' صورة'});
-    });
-  }
-  return save(fallback(),fallbackName);
+  return Promise.resolve(overlay(fallback(),fallbackName,all,{gallery:items,label:'تم تجهيز '+items.length+' صورة'}));
 }
 window.AyaSave={save:save,saveMany:saveMany,inApp:IN_APP,ios:IOS,mobile:MOBILE,canShareFiles:canShareFiles};
 })();
