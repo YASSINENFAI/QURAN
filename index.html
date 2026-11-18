@@ -69,6 +69,7 @@ header{max-width:1100px;margin:0 auto;padding:18px 20px 10px}
 .report-link svg{width:20px;height:20px;flex:0 0 auto}
 header p{margin:14px 0 0;color:var(--mute);max-width:620px;line-height:1.9}
 @media(max-width:520px){header{padding:10px 12px 8px}.sitebar{gap:8px;padding:8px 0 12px}.brand{gap:7px}.brand-mark{width:43px;height:43px}.brand-name{font-size:24px}.header-actions{gap:6px}.telegram-link{width:42px;height:42px;min-height:42px;padding:9px;border-radius:11px}.report-link{width:42px;height:42px;min-height:42px;padding:9px;border-radius:11px}.telegram-link svg,.report-link svg{width:21px;height:21px}.telegram-label,.report-label{display:none}header p{font-size:14px;margin-top:10px}}
+.pagenav{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.pagenav a{display:inline-flex;align-items:center;gap:6px;min-height:42px;padding:8px 16px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--green);text-decoration:none;font-weight:600;font-size:15px}.pagenav a:hover{background:#EFF4EF}.pagenav a[aria-current=page]{background:var(--green);border-color:var(--green);color:#fff}@media(max-width:520px){.pagenav a{padding:7px 12px;font-size:14px}}
 main{max-width:1100px;margin:0 auto;padding:20px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,440px);gap:28px;align-items:start}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:0 1px 2px rgba(20,48,43,.04),0 10px 30px rgba(20,48,43,.07)}
 fieldset{border:0;margin:0;padding:0;display:grid;gap:16px}
@@ -179,6 +180,11 @@ footer{max-width:1100px;margin:0 auto;padding:10px 20px 40px;color:var(--mute);f
 </a>
 </div>
 </nav>
+<nav class="pagenav" aria-label="صفحات الموقع">
+<a href="/" aria-current="page">🎬 صانع الفيديو</a>
+<a href="/quran.html">📖 القرآن الكريم وصور الآيات</a>
+<a href="/adhkar.html">🤲 الأذكار</a>
+</nav>
 <p>صانع فيديو قرآني مجاني: اختر نطاق الآيات — من آية إلى آية أو السورة كاملة — والقارئ وصورة الخلفية، وحمّل فيديو يتغيّر نصه مع كل آية في وقتها.</p>
 <div id="presence" class="presence is-loading" role="status" aria-live="polite"><span class="presence-dot" aria-hidden="true"></span><span id="presenceText">جارٍ حساب المتصلين…</span></div>
 </header>
@@ -209,9 +215,9 @@ footer{max-width:1100px;margin:0 auto;padding:10px 20px 40px;color:var(--mute);f
 <button type="button" class="bg-choice" data-bg="3" aria-pressed="false"><span class="bg-swatch bg-blue"></span><span>أزرق هادئ</span></button>
 <button type="button" class="bg-choice" data-bg="4" aria-pressed="false"><span class="bg-swatch bg-paper"></span><span>عاجي فاخر</span></button>
 </div>
-<label for="bg" class="upload-label">أو حمّل صورة من جهازك</label>
-<input id="bg" type="file" accept="image/*">
-<small class="wake">يمكنك التبديل بين الخلفيات الجاهزة أو اختيار صورتك الخاصة.</small>
+<label for="bg" class="upload-label">أو حمّل صورة أو فيديو خلفية من جهازك</label>
+<input id="bg" type="file" accept="image/*,video/*">
+<small class="wake">يمكنك التبديل بين الخلفيات الجاهزة أو اختيار صورة أو فيديو (يُكرَّر الفيديو تلقائياً ويُكتم صوته).</small>
 </div>
 <div><span class="lbl">أبعاد الفيديو</span>
 <div class="seg" id="ratio" role="group" aria-label="أبعاد الفيديو">
@@ -280,7 +286,7 @@ var COUNTS=[7,286,200,176,120,165,206,75,129,109,123,111,43,52,99,128,111,110,98
 var DIMS={p:[720,1280],s:[1080,1080],l:[1280,720]};
 var FOLDERS={yasser:'Yasser_Ad-Dussary_128kbps',maher:'MaherAlMuaiqly128kbps',sudais:'Abdurrahmaan_As-Sudais_192kbps',alafasy:'Alafasy_128kbps'};
 var BITRATE={yasser:128000,maher:128000,sudais:192000,alafasy:128000};
-var CONC=4, RETRIES=2, FPS=10, VBR=800000, ABR=96000, LEAD=.4, TAIL=.6;
+var CONC=4, RETRIES=2, FPS=10, VBR=800000, ABR=96000, LEAD=.4, TAIL=.6, VID_FPS=25, VID_VBR=2500000;
 
 var $=function(i){return document.getElementById(i)};
 var cv=$('cv'),ctx=cv.getContext('2d');
@@ -319,7 +325,7 @@ function recordVisit(client){
 }
 // المكتبة تُحمَّل مع defer حتى لا تؤخر ظهور الصفحة، فننتظرها قبل التهيئة
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initPresence);else initPresence();
-var st={text:'',img:null,bgPreset:0,color:'#FFFFFF',ov:.45,ratio:'p',recording:false,progress:0,cur:1,phase:'idle'};
+var st={text:'',img:null,vid:null,bgPreset:0,color:'#FFFFFF',ov:.45,ratio:'p',recording:false,progress:0,cur:1,phase:'idle'};
 var range={s:1,r:'yasser',from:1,to:1,texts:[],durations:[],total:0,ready:false};
 var textCache={},metaCache={},imgUrl=null,resUrl=null,ac=null;
 var shareVideoBtn=$('shareVideo');
@@ -496,7 +502,10 @@ function getWordTimings(reciter,surah,ayah,words,audioBuffer){
 }
 function draw(){
   var w=cv.width,h=cv.height,m=Math.min(w,h);
-  if(st.img){
+  if(st.vid&&st.vid.readyState>=2&&st.vid.videoWidth){
+    var vw=st.vid.videoWidth,vh=st.vid.videoHeight,vsc=Math.max(w/vw,h/vh);
+    ctx.drawImage(st.vid,(w-vw*vsc)/2,(h-vh*vsc)/2,vw*vsc,vh*vsc);
+  }else if(st.img){
     var s=Math.max(w/st.img.width,h/st.img.height),iw=st.img.width*s,ih=st.img.height*s;
     ctx.drawImage(st.img,(w-iw)/2,(h-ih)/2,iw,ih);
   }else{
@@ -699,10 +708,11 @@ function startCapture(a){
   gen.planned=LEAD+range.total+TAIL;
   var rec;
   try{
-    var vs=cv.captureStream(FPS);
+    // خلفية الفيديو تحتاج معدل إطارات ودقة أعلى من الخلفية الثابتة حتى تبدو سلسة
+    var vs=cv.captureStream(st.vid?VID_FPS:FPS);
     gen.dest=a.createMediaStreamDestination();
     gen.stream=new MediaStream(vs.getVideoTracks().concat(gen.dest.stream.getAudioTracks()));
-    var opts={videoBitsPerSecond:VBR,audioBitsPerSecond:ABR};
+    var opts={videoBitsPerSecond:st.vid?VID_VBR:VBR,audioBitsPerSecond:ABR};
     if(gen.mime)opts.mimeType=gen.mime;
     rec=new MediaRecorder(gen.stream,opts);
   }catch(e){
@@ -724,7 +734,8 @@ function startCapture(a){
   rec.start(1000);
   requestWake();
   scheduleAll();
-  gen.timer=setInterval(frame,100);
+  if(st.vid){try{st.vid.currentTime=0;var pv=st.vid.play();if(pv&&pv.catch)pv.catch(function(){})}catch(e){}}
+  gen.timer=setInterval(frame,st.vid?Math.round(1000/VID_FPS):100);
   frame();
 }
 function currEntry(now){
@@ -919,18 +930,53 @@ function seg(id,attr,fn){
 }
 seg('ratio','data-r',function(v){st.ratio=v;cv.width=DIMS[v][0];cv.height=DIMS[v][1];lastLayout=null;draw()});
 seg('colors','data-c',function(v){st.color=v;draw()});
+/* ---------- خلفية فيديو: مكتومة ومكرّرة، تُرسم على اللوحة مع كل إطار ---------- */
+var vidUrl=null,vidRaf=0;
+function clearVideo(){
+  cancelAnimationFrame(vidRaf);vidRaf=0;
+  if(st.vid){try{st.vid.pause();st.vid.removeAttribute('src');st.vid.load();st.vid.remove()}catch(e){}}
+  st.vid=null;
+  if(vidUrl){URL.revokeObjectURL(vidUrl);vidUrl=null}
+}
+function vidLoop(){
+  if(!st.vid){vidRaf=0;return}
+  if(!st.recording)draw();
+  vidRaf=requestAnimationFrame(vidLoop);
+}
+function loadVideoBg(f){
+  var u=URL.createObjectURL(f),v=document.createElement('video');
+  v.muted=true;v.loop=true;v.playsInline=true;v.setAttribute('playsinline','');v.setAttribute('muted','');v.preload='auto';
+  // بعض المتصفحات (Safari) لا تفك إطارات فيديو خارج الصفحة، لذلك نضيفه مخفياً
+  v.style.cssText='position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;left:0;top:0';
+  v.onloadeddata=function(){
+    if(st.recording){URL.revokeObjectURL(u);v.remove();return}
+    clearVideo();
+    if(imgUrl){URL.revokeObjectURL(imgUrl);imgUrl=null}
+    st.img=null;st.vid=v;vidUrl=u;
+    [].forEach.call($('bgPresets').querySelectorAll('button'),function(x){x.setAttribute('aria-pressed','false')});
+    var p=v.play();if(p&&p.catch)p.catch(function(){});
+    say('تم تعيين الفيديو خلفيةً. سيُكرَّر تلقائياً ويُكتم صوته، وتُسمع التلاوة فقط.');
+    if(!vidRaf)vidLoop();
+  };
+  v.onerror=function(){URL.revokeObjectURL(u);v.remove();say('تعذر تشغيل هذا الفيديو في المتصفح. جرّب ملف MP4 أو WebM.',true)};
+  document.body.appendChild(v);
+  v.src=u;
+}
 $('bgPresets').addEventListener('click',function(e){
   var b=e.target.closest('button[data-bg]');if(!b)return;
-  st.bgPreset=+b.getAttribute('data-bg');st.img=null;
+  st.bgPreset=+b.getAttribute('data-bg');st.img=null;clearVideo();
   [].forEach.call($('bgPresets').querySelectorAll('button'),function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});
   $('bg').value='';if(imgUrl){URL.revokeObjectURL(imgUrl);imgUrl=null}
   draw();
 });
 $('bg').addEventListener('change',function(e){
   var f=e.target.files[0];if(!f)return;
-  if(!/^image\//.test(f.type)){say('الملف المختار ليس صورة. اختر ملف صورة.',true);return}
+  if(st.recording){say('لا يمكن تغيير الخلفية أثناء الإنشاء.',true);return}
+  if(/^video\//.test(f.type)){loadVideoBg(f);return}
+  if(!/^image\//.test(f.type)){say('الملف المختار ليس صورة أو فيديو.',true);return}
   var u=URL.createObjectURL(f),im=new Image();
   im.onload=function(){
+    clearVideo();
     if(imgUrl)URL.revokeObjectURL(imgUrl);imgUrl=u;st.img=im;
     [].forEach.call($('bgPresets').querySelectorAll('button'),function(x){x.setAttribute('aria-pressed','false')});
     draw();
@@ -961,6 +1007,15 @@ document.addEventListener('visibilitychange',function(){
 fillAyahs();
 selT.value='1';
 syncLimits();
+// روابط من صفحة القرآن: /?s=2&f=255&t=255
+(function(){
+  try{
+    var q=new URLSearchParams(location.search),s=+q.get('s'),f=+q.get('f')||1,t=+q.get('t')||f;
+    if(!(s>=1&&s<=114))return;
+    var c=COUNTS[s-1];f=Math.min(Math.max(1,f|0),c);t=Math.min(Math.max(f,t|0),c);
+    selS.value=String(s);fillAyahs();selF.value=String(f);selT.value=String(t);syncLimits();
+  }catch(e){}
+})();
 draw();
 prepare();
 var fl=['400 40px "Amiri Quran"','600 24px "IBM Plex Sans Arabic"','400 24px "IBM Plex Sans Arabic"'];
