@@ -920,9 +920,9 @@ shareVideoBtn.addEventListener('click',function(){
   if(!(navigator.canShare&&navigator.canShare({files:[file]}))){say('استخدم زر التحميل، ثم افتح تطبيق «الملفات» > «التنزيلات» لنقل الفيديو إلى الصور.',true);return}
   navigator.share({files:[file],title:'مقطع آية'}).catch(function(err){if(err&&err.name!=='AbortError')say('تعذر فتح المشاركة. استخدم زر التحميل.',true)});
 });
-// روابط blob مع download لا تعمل على iPhone ومتصفحات التطبيقات، فنستخدم مسار الحفظ البديل هناك
+// نمرّ دائماً عبر AyaSave: يحفظ في الصور على الجوال ويُظهر مكان الملف على الكمبيوتر
 $('dl').addEventListener('click',function(e){
-  if(!resBlob||!window.AyaSave||!(AyaSave.inApp||AyaSave.ios))return;
+  if(!resBlob||!window.AyaSave)return;
   e.preventDefault();
   AyaSave.save(resBlob,$('dl').download||'ayah.mp4').then(function(r){if(r==='shared')say('تم حفظ الفيديو.')});
 });
