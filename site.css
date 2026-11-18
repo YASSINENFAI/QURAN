@@ -34,3 +34,13 @@ button{font:inherit}
 .err{color:var(--err)}
 footer{max-width:1100px;margin:0 auto;padding:10px 20px 40px;color:var(--mute);font-size:14px}
 @media(max-width:520px){header{padding:10px 12px 8px}.brand-mark{width:43px;height:43px}.brand-name{font-size:24px}.telegram-label{display:none}.telegram-link{padding:9px 11px}main{padding:12px}.panel{padding:16px}.pagenav a{padding:7px 12px;font-size:14px}}
+
+.page-title{margin:16px 0 2px;font-size:clamp(24px,4vw,32px);line-height:1.5;color:var(--green)}
+.page-lead{margin:0;color:var(--mute);max-width:850px;line-height:1.9}
+.seo-content{max-width:1100px;margin:0 auto;padding:4px 20px 24px;color:var(--ink)}
+.seo-content h2{margin:12px 0 8px;font-size:clamp(22px,3vw,30px);color:var(--green)}
+.seo-content h3{margin:18px 0 4px;font-size:18px;color:var(--green2)}
+.seo-content p,.seo-content ul{max-width:900px;color:var(--mute);line-height:1.95}
+.seo-content a{color:var(--green);font-weight:600}
+.seo-content .quran-sample,.seo-content .adhkar-sample{font-family:"Amiri Quran","Amiri",serif;font-size:clamp(19px,2.5vw,25px);line-height:2.2;color:var(--ink)}
+@media(max-width:520px){.seo-content{padding:4px 12px 20px}}
