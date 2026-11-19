@@ -125,7 +125,8 @@ for (const s of surahs) {
   const pages = [s.ayahs[0].page, s.ayahs[s.ayahs.length - 1].page];
   const baseTitle = `سورة ${s.name} مكتوبة كاملة بالرسم العثماني | مقطع آية`;
   const title = baseTitle.length < 50 ? `${baseTitle} | للقراءة` : baseTitle;
-  const description = `اقرأ سورة ${s.name} مكتوبة كاملة بالتشكيل والرسم العثماني، ${ayahWord(s.count)}، سورة ${s.type}. حمّل سورة ${s.name} صوراً أو أنشئ منها فيديو بصوت قارئك المفضل مجاناً.`;
+  const baseDescription = `اقرأ سورة ${s.name} كاملة بالرسم العثماني والتشكيل. عدد آياتها ${ayahWord(s.count)}، وهي سورة ${s.type}. استمع للتلاوة، أو حمّل صور الآيات وأنشئ فيديو قرآن مجاناً من المتصفح.`;
+  const description = baseDescription.length < 150 ? `${baseDescription} الآن` : baseDescription;
   const first = s.ayahs.slice(0, 1)[0].t.split(' ').slice(0, 8).join(' ');
   const text = s.ayahs.map((a) => `${esc(a.t)} <span class="n">﴿${ar(a.n)}﴾</span>`).join(' ');
   const body = `<article>
@@ -165,7 +166,7 @@ ${next ? `<a class="mini" href="${pathOf(next)}">سورة ${esc(next.name)} ←<
 // فهرس السور
 {
   const title = 'سور القرآن الكريم مكتوبة كاملة بالرسم العثماني (١١٤ سورة) | مقطع آية';
-  const description = 'فهرس سور القرآن الكريم الـ١١٤ مكتوبة كاملة بالتشكيل والرسم العثماني، مع عدد الآيات ونوع كل سورة، وتحميل السور صوراً أو فيديو مجاناً.';
+  const description = 'تصفّح فهرس سور القرآن الكريم الـ١١٤ مكتوبة كاملة بالتشكيل والرسم العثماني. تعرّف إلى عدد الآيات، واقرأها أو حمّلها صوراً وأنشئ فيديو قرآنياً مجاناً بسهولة.';
   const body = `<p class="crumbs"><a href="/">الرئيسية</a> › سور القرآن الكريم</p>
 <h1 class="sh">سور القرآن الكريم مكتوبة</h1>
 <p class="about">اختر سورة لقراءتها مكتوبة كاملة بالرسم العثماني، ثم حمّلها صوراً أو أنشئ منها فيديو.</p>
