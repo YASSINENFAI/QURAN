@@ -70,8 +70,8 @@ header{max-width:1100px;margin:0 auto;padding:18px 20px 10px}
 .report-link{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:9px 15px;border-radius:12px;background:#9B2C2C;color:#fff;text-decoration:none;font-weight:700;box-shadow:0 4px 12px rgba(155,44,44,.16);transition:transform .15s,background .15s}
 .report-link:hover{background:#7A1F1F;transform:translateY(-1px)}
 .report-link svg{width:20px;height:20px;flex:0 0 auto}
-header p{margin:14px 0 0;color:var(--mute);max-width:620px;line-height:1.9}
-@media(max-width:520px){header{padding:10px 12px 8px}.sitebar{gap:8px;padding:8px 0 12px}.brand{gap:7px}.brand-mark{width:43px;height:43px}.brand-name{font-size:24px}.header-actions{gap:6px}.telegram-link{width:42px;height:42px;min-height:42px;padding:9px;border-radius:11px}.report-link{width:42px;height:42px;min-height:42px;padding:9px;border-radius:11px}.telegram-link svg,.report-link svg{width:21px;height:21px}.telegram-label,.report-label{display:none}header p{font-size:14px;margin-top:10px}}
+header p,header h1.page-intro{font:inherit;margin:14px 0 0;color:var(--mute);max-width:620px;line-height:1.9}
+@media(max-width:520px){header{padding:10px 12px 8px}.sitebar{gap:8px;padding:8px 0 12px}.brand{gap:7px}.brand-mark{width:43px;height:43px}.brand-name{font-size:24px}.header-actions{gap:6px}.telegram-link{width:42px;height:42px;min-height:42px;padding:9px;border-radius:11px}.report-link{width:42px;height:42px;min-height:42px;padding:9px;border-radius:11px}.telegram-link svg,.report-link svg{width:21px;height:21px}.telegram-label,.report-label{display:none}header p,header h1.page-intro{font-size:14px;margin-top:10px}}
 .pagenav{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.pagenav a{display:inline-flex;align-items:center;gap:6px;min-height:42px;padding:8px 16px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--green);text-decoration:none;font-weight:600;font-size:15px}.pagenav a:hover{background:#EFF4EF}.pagenav a[aria-current=page]{background:var(--green);border-color:var(--green);color:#fff}@media(max-width:520px){.pagenav a{padding:7px 12px;font-size:14px}}
 main{max-width:1100px;margin:0 auto;padding:20px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,440px);gap:28px;align-items:start}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:0 1px 2px rgba(20,48,43,.04),0 10px 30px rgba(20,48,43,.07)}
@@ -166,7 +166,7 @@ footer{max-width:1100px;margin:0 auto;padding:10px 20px 40px;color:var(--mute);f
 <g stroke="#E3C16F" stroke-width="2.7" stroke-linecap="round"><path d="M22 31v4M27 27v12M32 23v20M37 27v12M42 31v4"/></g>
 <path d="M32 58l3 3-3 3-3-3z" fill="#E3C16F"/>
 </svg>
-<h1 class="brand-name">مقطع آية</h1>
+<span class="brand-name">مقطع آية</span>
 </a>
 <div class="header-actions">
 <a class="report-link" href="https://t.me/FGMANO" target="_blank" rel="noopener noreferrer" aria-label="الإبلاغ عن خطأ عبر تيليغرام" title="الإبلاغ عن خطأ أو اقتراح">
@@ -185,7 +185,7 @@ footer{max-width:1100px;margin:0 auto;padding:10px 20px 40px;color:var(--mute);f
 <a href="/surah/">📜 سور القرآن مكتوبة</a>
 <a href="/adhkar.html">🤲 الأذكار</a>
 </nav>
-<p>صانع فيديو قرآني مجاني: اختر نطاق الآيات — من آية إلى آية أو السورة كاملة — والقارئ وصورة الخلفية، وحمّل فيديو يتغيّر نصه مع كل آية في وقتها.</p>
+<h1 class="page-intro">صانع فيديو قرآني مجاني: اختر نطاق الآيات — من آية إلى آية أو السورة كاملة — والقارئ وصورة الخلفية، وحمّل فيديو يتغيّر نصه مع كل آية في وقتها.</h1>
 </header>
 <main>
 <section class="panel" aria-label="إعدادات الفيديو">
