@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /
+Disallow: /admin/
+Disallow: /private/
+Disallow: /api/
 
 Sitemap: https://quran-gamma-orpin.vercel.app/sitemap.xml
