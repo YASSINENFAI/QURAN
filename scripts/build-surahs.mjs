@@ -123,7 +123,8 @@ for (const s of surahs) {
   const prev = surahs[s.number - 2], next = surahs[s.number];
   const juz = [...new Set(s.ayahs.map((a) => a.juz))];
   const pages = [s.ayahs[0].page, s.ayahs[s.ayahs.length - 1].page];
-  const title = `سورة ${s.name} مكتوبة كاملة بالرسم العثماني | مقطع آية`;
+  const baseTitle = `سورة ${s.name} مكتوبة كاملة بالرسم العثماني | مقطع آية`;
+  const title = baseTitle.length < 50 ? `${baseTitle} | للقراءة` : baseTitle;
   const description = `اقرأ سورة ${s.name} مكتوبة كاملة بالتشكيل والرسم العثماني، ${ayahWord(s.count)}، سورة ${s.type}. حمّل سورة ${s.name} صوراً أو أنشئ منها فيديو بصوت قارئك المفضل مجاناً.`;
   const first = s.ayahs.slice(0, 1)[0].t.split(' ').slice(0, 8).join(' ');
   const text = s.ayahs.map((a) => `${esc(a.t)} <span class="n">﴿${ar(a.n)}﴾</span>`).join(' ');
