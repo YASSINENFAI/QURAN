@@ -559,6 +559,10 @@ function fileName(pg,i,total){
   if(dup.length>1)base+='-part'+(dup.indexOf(pg)+1);
   return base+'.'+opt.fmt;
 }
+function imageAlt(pg){
+  var range=pg.a===pg.b?'الآية '+ar(pg.a):'الآيات '+ar(pg.a)+'–'+ar(pg.b);
+  return 'صورة '+range+' من سورة '+NAMES[sel.s-1]+' بالرسم العثماني';
+}
 function renderBlob(i){
   var c=document.createElement('canvas'),sz=SIZES[opt.size];c.width=sz[0];c.height=sz[1];
   paint(c.getContext('2d'),pages[i],i,pages.length);
@@ -569,7 +573,7 @@ function done(r){say(RESULT[r]||'')}
 $('dlOne').onclick=function(){
   if(!pages.length||busy)return;
   // نرسم الصورة مباشرة عند الضغط ليبقى طلب المشاركة ضمن مهلة تفاعل المستخدم
-  renderBlob(page).then(function(b){return AyaSave.save(b,fileName(pages[page],page,pages.length))}).then(done).catch(function(){say('تعذر إنشاء الصورة.',true)});
+  renderBlob(page).then(function(b){return AyaSave.save(b,fileName(pages[page],page,pages.length),imageAlt(pages[page]))}).then(done).catch(function(){say('تعذر إنشاء الصورة.',true)});
 };
 $('dlAll').onclick=function(){
   if(!pages.length||busy)return;
@@ -584,7 +588,7 @@ $('dlAll').onclick=function(){
     }
     say('جارٍ تجهيز الصور… '+ar(i+1)+' / '+ar(n));
     renderBlob(i).then(function(b){return b.arrayBuffer().then(function(buf){return {b:b,buf:buf}})}).then(function(r){
-      items.push({blob:r.b,name:fileName(pages[i],i,n),data:new Uint8Array(r.buf)});i++;setTimeout(next,0);
+      items.push({blob:r.b,name:fileName(pages[i],i,n),alt:imageAlt(pages[i]),data:new Uint8Array(r.buf)});i++;setTimeout(next,0);
     }).catch(function(){busy=false;say('تعذر إنشاء بعض الصور. جرّب صيغة JPG أو نطاقاً أقصر.',true)});
   })();
 };

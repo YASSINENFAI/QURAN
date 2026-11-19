@@ -81,9 +81,9 @@ function overlay(blob,name,files,opts){
   if(gallery){
     media='<p style="font-size:18px">'+esc(opts.label||'')+'</p><div class="ays-grid">'+gallery.map(function(g){
       var u=URL.createObjectURL(g.blob);urls.push(u);
-      return '<a href="'+u+'" download="'+esc(g.name)+'" title="'+esc(g.name)+'"><img src="'+u+'" alt="'+esc(g.name)+'" loading="lazy"></a>';
+      return '<a href="'+u+'" download="'+esc(g.name)+'" title="'+esc(g.name)+'"><img src="'+u+'" alt="'+esc(g.alt||'صورة من القرآن الكريم')+'" loading="lazy"></a>';
     }).join('')+'</div>';
-  }else media=isVid?'<video src="'+url+'" controls playsinline></video>':isImg?'<img src="'+url+'" alt="'+esc(name)+'">':'<p style="font-size:18px">'+esc(opts.label||('الملف جاهز: '+name))+'</p>';
+  }else media=isVid?'<video src="'+url+'" controls playsinline></video>':isImg?'<img src="'+url+'" alt="'+esc(opts.alt||'صورة من القرآن الكريم')+'">':'<p style="font-size:18px">'+esc(opts.label||('الملف جاهز: '+name))+'</p>';
   var first=gallery?(MOBILE?'اضغط على أي صورة لتحميلها وحدها، أو اضغط عليها مطوّلاً ثم «حفظ الصورة».':'انقر على أي صورة لتحميلها وحدها، أو حمّل الكل في ملف ZIP.'):
     shareable?'الأسهل: اضغط «حفظ في الصور» ثم اختر '+(isVid?'«حفظ الفيديو»':'«حفظ الصورة»')+'.':
     isImg?(MOBILE?'اضغط مطوّلاً على الصورة ثم اختر «حفظ الصورة» أو «تنزيل الصورة».':'اضغط «تحميل»، أو انقر بالزر الأيمن على الصورة ثم «حفظ الصورة باسم».'):'';
@@ -120,9 +120,9 @@ function toast(name,isVid){
  * زر التحميل يفتح دائماً نافذة الحفظ (على كل الأجهزة) بدل تنزيل صامت:
  * معاينة، «حفظ في الصور» حيث تتوفر المشاركة، «تحميل»، ومكان الملف بعد التحميل.
  */
-function save(blob,name){
+function save(blob,name,alt){
   var f=toFile(blob,name);
-  return Promise.resolve(overlay(blob,name,f?[f]:null));
+  return Promise.resolve(overlay(blob,name,f?[f]:null,{alt:alt}));
 }
 /** عدة صور: معرض للصور نفسها (كل صورة قابلة للتحميل) مع زر ZIP للكل. */
 function saveMany(items,fallback,fallbackName){
