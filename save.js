@@ -19,6 +19,7 @@ function anchor(url,name){
   document.body.appendChild(a);a.click();a.remove();
 }
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function dimensions(w,h){w=Number(w);h=Number(h);return w>0&&h>0?' width="'+Math.floor(w)+'" height="'+Math.floor(h)+'"':''}
 
 var css='.ays-ov{position:fixed;inset:0;z-index:1000;background:rgba(5,20,17,.9);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px;direction:rtl;font:500 15px/1.7 "IBM Plex Sans Arabic",system-ui,sans-serif;color:#fff;text-align:center;overflow:auto}'+
 '.ays-ov img,.ays-ov video{max-width:100%;max-height:60vh;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.5);-webkit-touch-callout:default;-webkit-user-select:auto;user-select:auto}'+
@@ -26,7 +27,7 @@ var css='.ays-ov{position:fixed;inset:0;z-index:1000;background:rgba(5,20,17,.9)
 '.ays-ov button,.ays-ov a{min-height:44px;padding:9px 16px;border-radius:10px;border:0;background:#fff;color:#14564B;font:600 15px "IBM Plex Sans Arabic",sans-serif;text-decoration:none;cursor:pointer}'+
 '.ays-ov .ays-p{background:#E3C16F;color:#2B2116}'+
 '.ays-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;width:100%;max-width:640px;max-height:52vh;overflow:auto;padding:4px}'+
-'.ays-ov .ays-grid a{padding:0;min-height:0;background:none;border-radius:8px}.ays-ov .ays-grid img{width:100%;max-height:none;border-radius:8px;display:block}'+
+'.ays-ov .ays-grid a{padding:0;min-height:0;background:none;border-radius:8px}.ays-ov .ays-grid img{width:100%;height:auto;max-height:none;border-radius:8px;display:block}'+
 '.ays-toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:1001;max-width:min(560px,calc(100% - 24px));padding:12px 44px 12px 16px;border-radius:12px;background:#0E3F37;color:#fff;box-shadow:0 10px 30px rgba(0,0,0,.3);direction:rtl;font:500 14px/1.8 "IBM Plex Sans Arabic",sans-serif}'+
 '.ays-toast span{opacity:.85}.ays-toast button{position:absolute;top:8px;right:8px;border:0;background:none;color:#fff;font-size:16px;cursor:pointer}'+
 '.ays-bn{position:sticky;top:0;z-index:999;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;padding:9px 12px;background:#8A5A12;color:#fff;font:500 14px/1.6 "IBM Plex Sans Arabic",sans-serif;text-align:center;direction:rtl}'+
@@ -81,9 +82,9 @@ function overlay(blob,name,files,opts){
   if(gallery){
     media='<p style="font-size:18px">'+esc(opts.label||'')+'</p><div class="ays-grid">'+gallery.map(function(g){
       var u=URL.createObjectURL(g.blob);urls.push(u);
-      return '<a href="'+u+'" download="'+esc(g.name)+'" title="'+esc(g.name)+'"><img src="'+u+'" alt="'+esc(g.alt||'صورة من القرآن الكريم')+'" loading="lazy"></a>';
+      return '<a href="'+u+'" download="'+esc(g.name)+'" title="'+esc(g.name)+'"><img src="'+u+'" alt="'+esc(g.alt||'صورة من القرآن الكريم')+'"'+dimensions(g.width,g.height)+' loading="lazy" decoding="async"></a>';
     }).join('')+'</div>';
-  }else media=isVid?'<video src="'+url+'" controls playsinline></video>':isImg?'<img src="'+url+'" alt="'+esc(opts.alt||'صورة من القرآن الكريم')+'">':'<p style="font-size:18px">'+esc(opts.label||('الملف جاهز: '+name))+'</p>';
+  }else media=isVid?'<video src="'+url+'" controls playsinline></video>':isImg?'<img src="'+url+'" alt="'+esc(opts.alt||'صورة من القرآن الكريم')+'"'+dimensions(opts.width,opts.height)+' decoding="async">':'<p style="font-size:18px">'+esc(opts.label||('الملف جاهز: '+name))+'</p>';
   var first=gallery?(MOBILE?'اضغط على أي صورة لتحميلها وحدها، أو اضغط عليها مطوّلاً ثم «حفظ الصورة».':'انقر على أي صورة لتحميلها وحدها، أو حمّل الكل في ملف ZIP.'):
     shareable?'الأسهل: اضغط «حفظ في الصور» ثم اختر '+(isVid?'«حفظ الفيديو»':'«حفظ الصورة»')+'.':
     isImg?(MOBILE?'اضغط مطوّلاً على الصورة ثم اختر «حفظ الصورة» أو «تنزيل الصورة».':'اضغط «تحميل»، أو انقر بالزر الأيمن على الصورة ثم «حفظ الصورة باسم».'):'';

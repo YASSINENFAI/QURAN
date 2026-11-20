@@ -567,14 +567,14 @@ function imageAlt(pg){
 function renderBlob(i){
   var c=document.createElement('canvas'),sz=SIZES[opt.size];c.width=sz[0];c.height=sz[1];
   paint(c.getContext('2d'),pages[i],i,pages.length);
-  return new Promise(function(res,rej){c.toBlob(function(b){b?res(b):rej(new Error('blob'))},opt.fmt==='jpg'?'image/jpeg':'image/png',.93)});
+  return new Promise(function(res,rej){c.toBlob(function(b){b?res({blob:b,width:sz[0],height:sz[1]}):rej(new Error('blob'))},opt.fmt==='jpg'?'image/jpeg':'image/png',.93)});
 }
 var RESULT={shared:'تم الحفظ/المشاركة.',downloaded:'تم التحميل في مجلد «التنزيلات» (Downloads).',preview:'',cancelled:''};
 function done(r){say(RESULT[r]||'')}
 $('dlOne').onclick=function(){
   if(!pages.length||busy)return;
   // نرسم الصورة مباشرة عند الضغط ليبقى طلب المشاركة ضمن مهلة تفاعل المستخدم
-  renderBlob(page).then(function(b){return AyaSave.save(b,fileName(pages[page],page,pages.length),imageAlt(pages[page]))}).then(done).catch(function(){say('تعذر إنشاء الصورة.',true)});
+  renderBlob(page).then(function(r){return AyaSave.save(r.blob,fileName(pages[page],page,pages.length),imageAlt(pages[page]),r.width,r.height)}).then(done).catch(function(){say('تعذر إنشاء الصورة.',true)});
 };
 $('dlAll').onclick=function(){
   if(!pages.length||busy)return;
@@ -588,8 +588,8 @@ $('dlAll').onclick=function(){
       return;
     }
     say('جارٍ تجهيز الصور… '+ar(i+1)+' / '+ar(n));
-    renderBlob(i).then(function(b){return b.arrayBuffer().then(function(buf){return {b:b,buf:buf}})}).then(function(r){
-      items.push({blob:r.b,name:fileName(pages[i],i,n),alt:imageAlt(pages[i]),data:new Uint8Array(r.buf)});i++;setTimeout(next,0);
+    renderBlob(i).then(function(r){return r.blob.arrayBuffer().then(function(buf){return {b:r.blob,buf:buf,width:r.width,height:r.height}})}).then(function(r){
+      items.push({blob:r.b,name:fileName(pages[i],i,n),alt:imageAlt(pages[i]),width:r.width,height:r.height,data:new Uint8Array(r.buf)});i++;setTimeout(next,0);
     }).catch(function(){busy=false;say('تعذر إنشاء بعض الصور. جرّب صيغة JPG أو نطاقاً أقصر.',true)});
   })();
 };
@@ -597,8 +597,8 @@ var shareBtn=$('share');
 shareBtn.hidden=!(navigator.share&&navigator.canShare)||AyaSave.mobile;
 shareBtn.onclick=function(){
   if(!pages.length)return;
-  renderBlob(page).then(function(b){
-    var f=new File([b],fileName(pages[page],page,pages.length),{type:b.type});
+  renderBlob(page).then(function(r){
+    var f=new File([r.blob],fileName(pages[page],page,pages.length),{type:r.blob.type});
     if(navigator.canShare({files:[f]}))return navigator.share({files:[f],title:'سورة '+NAMES[sel.s-1]});
     say('المشاركة غير مدعومة هنا، استخدم زر التحميل.',true);
   }).catch(function(e){if(e&&e.name!=='AbortError')say('تعذرت المشاركة.',true)});
