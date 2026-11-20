@@ -31,15 +31,36 @@
 <script type="application/ld+json">
 {
   "@context":"https://schema.org",
-  "@type":"WebApplication",
-  "name":"مقطع آية",
-  "url":"https://quran-gamma-orpin.vercel.app/",
-  "description":"صانع فيديو قرآني مجاني لإنشاء فيديو من آيات القرآن بصوت القارئ والخلفية التي يختارها المستخدم.",
-  "applicationCategory":"MultimediaApplication",
-  "operatingSystem":"Any",
-  "inLanguage":"ar",
-  "isAccessibleForFree":true,
-  "featureList":["اختيار السورة والآيات","اختيار قارئ القرآن","إضافة خلفية للفيديو","تصدير الفيديو من المتصفح"]
+  "@graph":[
+    {
+      "@type":"Organization",
+      "@id":"https://quran-gamma-orpin.vercel.app/#organization",
+      "name":"مقطع آية",
+      "url":"https://quran-gamma-orpin.vercel.app/"
+    },
+    {
+      "@type":"WebSite",
+      "@id":"https://quran-gamma-orpin.vercel.app/#website",
+      "name":"مقطع آية",
+      "url":"https://quran-gamma-orpin.vercel.app/",
+      "inLanguage":"ar",
+      "publisher":{"@id":"https://quran-gamma-orpin.vercel.app/#organization"}
+    },
+    {
+      "@type":"WebApplication",
+      "@id":"https://quran-gamma-orpin.vercel.app/#webapplication",
+      "name":"مقطع آية",
+      "url":"https://quran-gamma-orpin.vercel.app/",
+      "description":"صانع فيديو قرآني مجاني لإنشاء فيديو من آيات القرآن بصوت القارئ والخلفية التي يختارها المستخدم.",
+      "applicationCategory":"MultimediaApplication",
+      "operatingSystem":"Any",
+      "inLanguage":"ar",
+      "isAccessibleForFree":true,
+      "isPartOf":{"@id":"https://quran-gamma-orpin.vercel.app/#website"},
+      "provider":{"@id":"https://quran-gamma-orpin.vercel.app/#organization"},
+      "featureList":["اختيار السورة والآيات","اختيار قارئ القرآن","إضافة خلفية للفيديو","تصدير الفيديو من المتصفح"]
+    }
+  ]
 }
 </script>
 <script type="application/ld+json">
