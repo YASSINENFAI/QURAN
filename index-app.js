@@ -196,7 +196,7 @@ function draw(){
     var s=Math.max(w/st.img.width,h/st.img.height),iw=st.img.width*s,ih=st.img.height*s;
     ctx.drawImage(st.img,(w-iw)/2,(h-ih)/2,iw,ih);
   }else{
-    var palettes=[['#287968','#0A2925','#E3C16F'],['#415B8A','#111B3C','#D8C9FF'],['#F0D9A0','#583A2B','#FFF0C2'],['#6B9EAE','#132C43','#D5F0FF'],['#FFF7DF','#A99162','#71552D']];
+    var palettes=[['#287968','#0A2925','#E3C16F'],['#415B8A','#111B3C','#D8C9FF'],['#F0D9A0','#583A2B','#FFF0C2'],['#6B9EAE','#132C43','#D5F0FF'],['#FFF7DF','#A99162','#71552D'],['#000000','#000000','#FFFFFF']];
     var pal=palettes[st.bgPreset]||palettes[0];
     var g=ctx.createLinearGradient(0,0,w,h);g.addColorStop(0,pal[0]);g.addColorStop(1,pal[1]);
     ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
@@ -217,7 +217,7 @@ function draw(){
       ctx.strokeStyle='rgba(213,240,255,.18)';ctx.lineWidth=Math.max(1,m*.002);
       for(var wi=1;wi<9;wi++){ctx.beginPath();ctx.arc(w*.5,h*.5,m*wi*.09,0,Math.PI*2);ctx.stroke()}
       ctx.fillStyle='rgba(8,30,48,.25)';ctx.fillRect(0,h*.82,w,h*.18);
-    }else{
+    }else if(st.bgPreset===4){
       ctx.strokeStyle='rgba(113,85,45,.22)';ctx.lineWidth=Math.max(1,m*.002);
       for(var py=m*.06;py<h;py+=m*.09)for(var px=m*.06;px<w;px+=m*.09){ctx.beginPath();ctx.moveTo(px,py-m*.018);ctx.lineTo(px+m*.018,py);ctx.lineTo(px,py+m*.018);ctx.lineTo(px-m*.018,py);ctx.closePath();ctx.stroke()}
     }
